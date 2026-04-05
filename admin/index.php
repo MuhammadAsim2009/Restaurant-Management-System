@@ -87,6 +87,7 @@ require_once __DIR__ . '/../includes/auth_guard.php';
         </div>
     </div>
 
+    <script src="../assets/js/toast.js"></script>
     <script src="../assets/js/admin.js"></script>
 </body>
 </html>
