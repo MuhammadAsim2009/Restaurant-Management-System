@@ -1,0 +1,29 @@
+/* Custom CSS extensions for Kitchen 86 */
+
+/* Scrollbar Customization for global dark theme feel */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0A0A0A;
+}
+::-webkit-scrollbar-thumb {
+    background: #2A2A2A;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #FF2020;
+}
+
+/* Base resets for forms to fit theme */
+input, select, textarea {
+    background-color: #161616;
+    color: #FFFFFF;
+    border: 1px solid #2A2A2A;
+    /* transition: border-color 0.2s ease-in-out; */
+}
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #FF2020;
+}
