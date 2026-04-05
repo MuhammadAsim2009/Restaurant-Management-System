@@ -5,7 +5,12 @@ require_once __DIR__ . '/../includes/auth_guard.php';
 $resource = $_GET['resource'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
 
-$data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+// Handle both JSON and Multipart Form Data (for file uploads)
+if (strpos($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data') !== false) {
+    $data = $_POST;
+} else {
+    $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+}
 
 switch($resource) {
     case 'dashboard':
@@ -45,17 +50,69 @@ switch($resource) {
             $stmt = $pdo->query("SELECT m.*, c.name as category_name FROM menu_items m LEFT JOIN categories c ON m.category_id = c.id ORDER BY m.id DESC");
             jsonResponse(true, $stmt->fetchAll());
         } elseif ($method === 'POST') {
-            $stmt = $pdo->prepare("INSERT INTO menu_items (category_id, name, description, price, is_available) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$data['category_id'], $data['name'], $data['description'], $data['price'], $data['is_available'] ?? 1]);
-            jsonResponse(true, ['id' => $pdo->lastInsertId()], 'Item added');
+            $id = $data['id'] ?? null;
+            $imagePath = $data['existing_image'] ?? '';
+            
+            // Handle File Upload
+            if (isset($_FILES['item_image']) && $_FILES['item_image']['error'] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $_FILES['item_image']['tmp_name'];
+                $fileName = $_FILES['item_image']['name'];
+                $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                $newFileName = 'menu_' . uniqid() . '.' . $fileExtension;
+                $uploadDir = __DIR__ . '/../assets/images/menu/';
+                
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+                
+                $destPath = $uploadDir . $newFileName;
+                if (move_uploaded_file($fileTmpPath, $destPath)) {
+                    $imagePath = 'assets/images/menu/' . $newFileName;
+                }
+            }
+
+            if ($id) {
+                // UPDATE Existing Item
+                $stmt = $pdo->prepare("UPDATE menu_items SET category_id=?, name=?, description=?, price=?, image=?, is_available=? WHERE id=?");
+                $stmt->execute([
+                    $data['category_id'], 
+                    $data['name'], 
+                    $data['description'] ?? '', 
+                    $data['price'], 
+                    $imagePath, 
+                    $data['is_available'] ?? 1,
+                    $id
+                ]);
+                jsonResponse(true, null, 'Item updated successfully');
+            } else {
+                // INSERT New Item
+                $stmt = $pdo->prepare("INSERT INTO menu_items (category_id, name, description, price, image, is_available) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $data['category_id'], 
+                    $data['name'], 
+                    $data['description'] ?? '', 
+                    $data['price'], 
+                    $imagePath, 
+                    $data['is_available'] ?? 1
+                ]);
+                jsonResponse(true, ['id' => $pdo->lastInsertId()], 'Item added successfully');
+            }
         } elseif ($method === 'PATCH') {
-            $stmt = $pdo->prepare("UPDATE menu_items SET category_id=?, name=?, description=?, price=?, is_available=? WHERE id=?");
-            $stmt->execute([$data['category_id'], $data['name'], $data['description'], $data['price'], $data['is_available'], $data['id']]);
-            jsonResponse(true, null, 'Item updated');
+            // Support for PATCH with file uploads is trickier in PHP (standard $_POST doesn't work for PATCH)
+            // For now, let's keep it simple or assume POST with _method=PATCH if needed
+            $stmt = $pdo->prepare("UPDATE menu_items SET category_id=?, name=?, description=?, price=?, image=?, is_available=? WHERE id=?");
+            $stmt->execute([
+                $data['category_id'], 
+                $data['name'], 
+                $data['description'], 
+                $data['price'], 
+                $data['image'], 
+                $data['is_available'], 
+                $data['id']
+            ]);
+            jsonResponse(true, null, 'Item updated successfully');
         } elseif ($method === 'DELETE') {
             $stmt = $pdo->prepare("DELETE FROM menu_items WHERE id=?");
             $stmt->execute([$data['id']]);
-            jsonResponse(true, null, 'Item deleted');
+            jsonResponse(true, null, 'Item deleted successfully');
         }
         break;
 
