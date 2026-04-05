@@ -14,6 +14,29 @@ switch($resource) {
         $stats['revenue_today'] = $pdo->query("SELECT COALESCE(SUM(total), 0) FROM orders WHERE DATE(created_at) = CURDATE() AND status != 'cancelled'")->fetchColumn();
         $stats['pending_orders'] = $pdo->query("SELECT COUNT(*) FROM orders WHERE status = 'pending'")->fetchColumn();
         $stats['total_users'] = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        
+        // Revenue Chart (Last 7 Days)
+        $chartQuery = $pdo->query("
+            SELECT DATE(created_at) as date, SUM(total) as revenue 
+            FROM orders 
+            WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) 
+            AND status != 'cancelled'
+            GROUP BY DATE(created_at) 
+            ORDER BY date ASC
+        ");
+        $stats['chart_data'] = $chartQuery->fetchAll();
+
+        // Top Selling Items
+        $topItemsQuery = $pdo->query("
+            SELECT mi.name, mi.image, mi.price, SUM(oi.quantity) as sold_count, SUM(oi.subtotal) as total_revenue
+            FROM order_items oi
+            JOIN menu_items mi ON oi.item_id = mi.id
+            GROUP BY mi.id
+            ORDER BY sold_count DESC
+            LIMIT 5
+        ");
+        $stats['top_items'] = $topItemsQuery->fetchAll();
+
         jsonResponse(true, $stats);
         break;
 

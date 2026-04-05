@@ -3,7 +3,14 @@ window.CartInterface = {
     init() { this.load(); this.ui(); },
     load() { try { this.items = JSON.parse(localStorage.getItem('k86_cart')) || []; } catch(e){ this.items=[]; } },
     save() { localStorage.setItem('k86_cart', JSON.stringify(this.items)); this.ui(); },
-    addItem(p) { let ex = this.items.find(i => i.id === p.id); if(ex) ex.qty++; else this.items.push({id:p.id, name:p.name, price:p.price, qty:1}); this.save(); if(window.Toast) window.Toast('Item added to cart!', 'success'); },
+    addItem(p) { 
+        if(!window.AuthInterface || !window.AuthInterface.isLoggedIn) {
+            if(window.Toast) window.Toast.show('Please login to add items to your cart!', 'warning');
+            window.AuthInterface.openLogin();
+            return;
+        }
+        let ex = this.items.find(i => i.id === p.id); if(ex) ex.qty++; else this.items.push({id:p.id, name:p.name, price:p.price, qty:1}); this.save(); if(window.Toast) window.Toast.show('Item added to cart!', 'success'); 
+    },
     updateQty(id, d) { let i = this.items.find(i=>i.id===id); if(i) { i.qty+=d; if(i.qty<=0) this.items=this.items.filter(x=>x.id!==id); this.save(); } },
     getTotals() { let sub = this.items.reduce((s,i)=>s+(i.price*i.qty), 0); return {sub, total:sub}; },
     ui() {

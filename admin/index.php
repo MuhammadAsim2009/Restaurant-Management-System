@@ -1,151 +1,120 @@
-<?php require_once __DIR__ . '/includes/header.php'; ?>
+<?php 
+require_once __DIR__ . '/includes/header.php'; 
+// Note: header.php already includes sidebar.php and opens the <main> tag and #admin-content div
+?>
 
-<div class="animate-fade-in space-y-6" data-page="dashboard">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
+<div class="animate-fade-in space-y-8 pb-12" data-page="dashboard">
+    <!-- Dashboard Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-            <h2 class="text-3xl font-heading font-bold text-white leading-tight">OVERVIEW</h2>
-            <p class="text-k86-muted text-sm">Welcome back. Here's what's happening at Kitchen 86.</p>
+            <h1 class="text-4xl md:text-5xl font-display text-white tracking-widest uppercase">Dashboard Overview</h1>
+            <p class="text-k86-muted font-body mt-1">Real-time business performance metrics for <span class="text-k86-red font-semibold">Kitchen 86</span>.</p>
         </div>
-        <button class="bg-k86-surface2 hover:bg-k86-surface text-sm px-4 py-2 rounded-lg border border-k86-border font-semibold flex items-center gap-2 transition-all hover:border-k86-muted">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-            Export Report
-        </button>
+        <div class="flex items-center gap-3 bg-k86-surface2 p-1.5 rounded-xl border border-k86-border shadow-inner">
+            <button class="px-4 py-2 bg-k86-red text-white rounded-lg text-sm font-bold shadow-lg shadow-k86-red/20 transition-all">Today</button>
+            <p class="px-4 py-2 text-k86-muted text-sm font-semibold" id="current-date"><?php echo date('M d, Y'); ?></p>
+        </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6" id="dash-stats">
-        <div class="p-4 text-center text-k86-muted col-span-full">Loading stats...</div>
+    <!-- Overview Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="dash-stats-grid">
+        <!-- Today's Orders Skeleton -->
+        <div class="bg-k86-surface border border-k86-border p-6 rounded-2xl animate-pulse">
+            <div class="h-4 bg-k86-surface2 rounded w-24 mb-4"></div>
+            <div class="h-10 bg-k86-surface2 rounded w-16 mb-4"></div>
+            <div class="h-1 bg-k86-surface2 rounded w-full"></div>
+        </div>
+        <!-- Revenue Skeleton -->
+        <div class="bg-k86-surface border border-k86-border p-6 rounded-2xl animate-pulse">
+            <div class="h-4 bg-k86-surface2 rounded w-24 mb-4"></div>
+            <div class="h-10 bg-k86-surface2 rounded w-32 mb-4"></div>
+            <div class="h-1 bg-k86-surface2 rounded w-full"></div>
+        </div>
+        <!-- Pending Skeleton -->
+        <div class="bg-k86-surface border border-k86-border p-6 rounded-2xl animate-pulse">
+            <div class="h-4 bg-k86-surface2 rounded w-24 mb-4"></div>
+            <div class="h-10 bg-k86-surface2 rounded w-16 mb-4"></div>
+            <div class="h-1 bg-k86-surface2 rounded w-full"></div>
+        </div>
+        <!-- Customers Skeleton -->
+        <div class="bg-k86-surface border border-k86-border p-6 rounded-2xl animate-pulse">
+            <div class="h-4 bg-k86-surface2 rounded w-24 mb-4"></div>
+            <div class="h-10 bg-k86-surface2 rounded w-20 mb-4"></div>
+            <div class="h-1 bg-k86-surface2 rounded w-full"></div>
+        </div>
     </div>
 
-    <!-- Charts & Tables Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Main Chart -->
-        <div class="lg:col-span-2 bg-k86-surface border border-k86-border rounded-xl p-5">
-            <h3 class="text-lg font-heading font-bold mb-4">Revenue Overview</h3>
-            <div class="w-full h-64 relative">
-                <!-- Chart container -->
+    <!-- Revenue Chart and Top Selling Items -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Revenue Overview Chart -->
+        <div class="lg:col-span-2 bg-k86-surface border border-k86-border rounded-3xl p-6 lg:p-8 relative">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h3 class="text-xl font-heading font-bold text-white flex items-center gap-2">
+                        <span class="w-2 h-6 bg-k86-red rounded-full"></span>
+                        Revenue Overview (Last 7 Days)
+                    </h3>
+                </div>
+                <div class="text-right">
+                    <p class="text-k86-muted text-xs uppercase font-bold tracking-tighter">Current Status</p>
+                    <p class="text-xl font-price font-bold text-k86-amber" id="chart-total-rev">PKR --</p>
+                </div>
+            </div>
+            <div class="h-80 w-full relative">
+                <div id="chart-loader" class="absolute inset-0 flex items-center justify-center bg-k86-surface/50 z-10">
+                    <div class="w-8 h-8 border-4 border-k86-red border-t-transparent rounded-full animate-spin"></div>
+                </div>
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
 
-        <!-- Top Items -->
-        <div class="bg-k86-surface border border-k86-border rounded-xl p-5">
-            <h3 class="text-lg font-heading font-bold mb-4">Top Selling Items</h3>
-            <div class="space-y-4">
-                <div class="flex items-center gap-4 p-3 bg-k86-surface2 rounded-lg hover:-translate-y-1 transition-transform border border-transparent hover:border-k86-border">
-                    <div class="w-12 h-12 bg-k86-black rounded-md overflow-hidden shrink-0 border border-k86-border">
-                        <div class="w-full h-full bg-k86-border flex items-center justify-center">🍟</div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-white truncate shadow-sm">Cheezious Matka Fries</h4>
-                        <p class="text-k86-muted text-xs">84 orders today</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-price text-k86-amber font-bold">PKR 450</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 p-3 bg-k86-surface2 rounded-lg hover:-translate-y-1 transition-transform border border-transparent hover:border-k86-border">
-                    <div class="w-12 h-12 bg-k86-black rounded-md overflow-hidden shrink-0 border border-k86-border">
-                        <div class="w-full h-full bg-k86-border flex items-center justify-center">🍔</div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-white truncate shadow-sm">K86 Special Zinger</h4>
-                        <p class="text-k86-muted text-xs">62 orders today</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-price text-k86-amber font-bold">PKR 650</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 p-3 bg-k86-surface2 rounded-lg hover:-translate-y-1 transition-transform border border-transparent hover:border-k86-border">
-                    <div class="w-12 h-12 bg-k86-black rounded-md overflow-hidden shrink-0 border border-k86-border">
-                        <div class="w-full h-full bg-k86-border flex items-center justify-center">🔥</div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-white truncate shadow-sm">Fire Wings (6pc)</h4>
-                        <p class="text-k86-muted text-xs">45 orders today</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-price text-k86-amber font-bold">PKR 550</p>
-                    </div>
-                </div>
+        <!-- Top Selling Items -->
+        <div class="bg-k86-surface border border-k86-border rounded-3xl p-6 lg:p-8">
+            <h3 class="text-xl font-heading font-bold text-white mb-6 flex items-center gap-2">
+                <span class="w-2 h-6 bg-k86-amber rounded-full"></span>
+                Top Selling Items
+            </h3>
+            <div class="space-y-4 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar" id="dash-top-items">
+                <div class="text-center py-10 text-k86-muted text-sm">Loading top items...</div>
             </div>
+            <a href="items.php" class="block w-full mt-6 py-3 bg-k86-surface2 text-k86-muted hover:text-white rounded-xl border border-k86-border hover:border-k86-red transition-all text-sm font-bold uppercase tracking-widest text-center">Manage Menu</a>
         </div>
     </div>
 
     <!-- Recent Orders Table -->
-    <div class="bg-k86-surface border border-k86-border rounded-xl shadow-lg mt-6 overflow-hidden">
-        <div class="p-5 border-b border-k86-border flex justify-between items-center">
-            <h3 class="text-lg font-heading font-bold">Recent Orders</h3>
-            <a href="orders.php" class="text-sm font-semibold text-k86-red hover:text-k86-red-dark">View All →</a>
+    <div class="bg-k86-surface border border-k86-border rounded-3xl overflow-hidden shadow-2xl">
+        <div class="p-6 lg:p-8 border-b border-k86-border flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h3 class="text-2xl font-heading font-bold text-white">Recent Orders</h3>
+                <p class="text-k86-muted text-sm">Processing real-time customer requests</p>
+            </div>
+            <a href="orders.php" class="px-6 py-2 bg-k86-surface2 hover:bg-k86-red hover:text-white text-k86-muted rounded-full border border-k86-border transition-all text-xs font-bold uppercase tracking-widest">Full History</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm whitespace-nowrap">
-                <thead class="bg-k86-surface2 text-k86-muted">
+                <thead class="bg-k86-surface2 text-k86-muted uppercase text-[10px] font-bold tracking-[0.2em]">
                     <tr>
-                        <th class="p-4 font-semibold uppercase tracking-wider text-xs">Order ID</th>
-                        <th class="p-4 font-semibold uppercase tracking-wider text-xs">Customer</th>
-                        <th class="p-4 font-semibold uppercase tracking-wider text-xs">Type</th>
-                        <th class="p-4 font-semibold uppercase tracking-wider text-xs">Total</th>
-                        <th class="p-4 font-semibold uppercase tracking-wider text-xs">Status</th>
+                        <th class="p-6 border-b border-k86-border">Order ID</th>
+                        <th class="p-6 border-b border-k86-border">Customer</th>
+                        <th class="p-6 border-b border-k86-border">Type</th>
+                        <th class="p-6 border-b border-k86-border">Total</th>
+                        <th class="p-6 border-b border-k86-border">Status</th>
+                        <th class="p-6 border-b border-k86-border text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-k86-border" id="dash-recent-orders">
-                    <tr><td colspan="5" class="p-4 text-center text-k86-muted">Loading...</td></tr>
+                    <tr><td colspan="6" class="p-10 text-center text-k86-muted">Fetching latest orders...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-    // Chart.js placeholder initialization
-    const ctx = document.getElementById('revenueChart');
-    if(!ctx) return;
-    
-    // Gradient for chart
-    let gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(255, 32, 32, 0.5)'); // k86-red
-    gradient.addColorStop(1, 'rgba(255, 32, 32, 0)');
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            datasets: [{
-                label: 'Revenue (PKR)',
-                data: [45000, 52000, 48000, 61000, 84500, 95000, 82000],
-                borderColor: '#FF2020',
-                backgroundColor: gradient,
-                borderWidth: 3,
-                pointBackgroundColor: '#FFB800',
-                pointBorderColor: '#161616',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#2A2A2A', drawBorder: false },
-                    ticks: { color: '#AAAAAA', font: { family: 'Barlow Condensed' } }
-                },
-                x: {
-                    grid: { display: false, drawBorder: false },
-                    ticks: { color: '#AAAAAA', font: { family: 'Barlow' } }
-                }
-            },
-            interaction: { mode: 'index', intersect: false }
-        }
-    });
-});
-</script>
+<style>
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FF2020; }
+</style>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
