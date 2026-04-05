@@ -148,6 +148,14 @@ switch($resource) {
         if ($method === 'GET') {
             $stmt = $pdo->query("SELECT id, name, email, phone, role, created_at FROM users ORDER BY created_at DESC");
             jsonResponse(true, $stmt->fetchAll());
+        } elseif ($method === 'POST') {
+            $stmt = $pdo->prepare("UPDATE users SET role = ? WHERE id = ?");
+            $stmt->execute([$data['new_role'], $data['id']]);
+            jsonResponse(true, null, 'User role updated to ' . $data['new_role']);
+        } elseif ($method === 'DELETE') {
+            $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+            $stmt->execute([$data['id']]);
+            jsonResponse(true, null, 'User deleted successfully');
         }
         break;
 

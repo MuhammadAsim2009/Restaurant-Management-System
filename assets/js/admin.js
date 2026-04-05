@@ -1,7 +1,8 @@
 /** Kitchen 86 - Admin Panel MPA logic */
 window.adminApp = {
     revenueChart: null,
-    itemsCache: [], // Local cache for actions
+    itemsCache: [], // Local cache for products
+    usersCache: [], // Local cache for users
 
     init() { this.route(); },
     
@@ -43,7 +44,16 @@ window.adminApp = {
                 }
 
             } else if (page === 'users') {
-                this.fetchTableData('../api/admin.php?resource=users', 'tbl-users', this.userRowTemplate);
+                const el = document.getElementById('tbl-users');
+                if(!el) return;
+                let r = await fetch('../api/admin.php?resource=users');
+                if(r.ok) {
+                    let j = await r.json();
+                    if(j.success && j.data) {
+                        this.usersCache = j.data;
+                        el.innerHTML = j.data.map(item => this.userRowTemplate(item)).join('');
+                    }
+                }
             } else if (page === 'items') {
                 const el = document.getElementById('tbl-items');
                 if(!el) return;
@@ -553,7 +563,28 @@ window.adminApp = {
 
     // Row Templates for other pages
     userRowTemplate(u) {
-        return `<tr><td class="p-4">${u.name}</td><td class="p-4 text-k86-muted">${u.email}</td><td class="p-4">${u.phone||'-'}</td><td class="p-4"><span class="uppercase font-bold text-xs ${u.role==='admin'?'text-k86-red bg-k86-red/10 px-2 py-1 rounded-full':'text-k86-muted'}">${u.role}</span></td></tr>`;
+        const isAdmin = u.role === 'admin';
+        return `
+            <tr class="hover:bg-k86-surface2/50 transition-colors group">
+                <td class="p-4 font-bold text-white">${u.name}</td>
+                <td class="p-4 text-k86-muted text-xs truncate max-w-[150px]">${u.email}</td>
+                <td class="p-4 text-xs font-mono text-white/70">${u.phone || '-'}</td>
+                <td class="p-4">
+                    <span class="uppercase font-bold text-[9px] tracking-widest px-3 py-1 rounded-full border ${isAdmin ? 'text-k86-red bg-k86-red/10 border-k86-red/20' : 'text-k86-amber bg-k86-amber/10 border-k86-amber/20'}">
+                        ${u.role}
+                    </span>
+                </td>
+                <td class="p-4 text-right space-x-2 flex items-center justify-end gap-2">
+                    <label class="relative inline-flex items-center cursor-pointer" title="${isAdmin ? 'Revoke Admin' : 'Make Admin'}">
+                        <input type="checkbox" ${isAdmin ? 'checked' : ''} onchange="adminApp.toggleUserRole(${u.id}, '${u.role}')" class="sr-only peer">
+                        <div class="w-9 h-5 bg-k86-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-k86-red"></div>
+                    </label>
+                    <button onclick="adminApp.confirmDeleteUser(${u.id})" class="p-2 text-k86-danger/50 hover:text-k86-danger hover:bg-k86-danger/10 rounded-lg transition-all" title="Delete User">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
     },
     itemRowTemplate(i) {
         return `
@@ -595,6 +626,62 @@ window.adminApp = {
     },
     categoryItemTemplate(c) {
         return `<li class="bg-k86-surface2 p-4 rounded-lg flex justify-between items-center group hover:border-k86-red border border-transparent transition-colors"><span class="font-bold text-white text-lg"><span class="text-2xl mr-2">${c.icon}</span> ${c.name}</span><span class="text-k86-muted text-sm bg-k86-black px-3 py-1 rounded-full border border-k86-border">Order: ${c.display_order}</span></li>`;
+    },
+
+    async toggleUserRole(id, currentRole) {
+        const newRole = currentRole === 'admin' ? 'customer' : 'admin';
+        try {
+            let r = await fetch('../api/admin.php?resource=users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, new_role: newRole })
+            });
+            let j = await r.json();
+            if(j.success) {
+                if(window.Toast) Toast.show(j.message || `Promoted to ${newRole}`, 'success');
+                this.fetchData('users'); // Refresh table
+            } else {
+                if(window.Toast) Toast.show(j.message || 'Error updating role', 'error');
+            }
+        } catch(e) { console.error('Toggle role error', e); }
+    },
+
+    confirmDeleteUser(id) {
+        const user = this.usersCache.find(u => u.id == id);
+        if(!user) return;
+
+        const modalHtml = `
+            <div class="text-center space-y-6 py-4">
+                <div class="w-20 h-20 bg-k86-danger/10 rounded-full flex items-center justify-center text-k86-danger mx-auto">
+                    <i class="fa-solid fa-user-xmark text-4xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-heading font-bold text-white uppercase tracking-wider">Remove User?</h3>
+                    <p class="text-k86-muted mt-2 px-6">Are you sure you want to delete <span class="text-white font-bold">${user.name}</span>? This will permanently remove their account and order history.</p>
+                </div>
+                <div class="flex gap-3 px-4">
+                    <button onclick="adminApp.closeModal()" class="flex-1 px-6 py-4 bg-k86-surface2 text-white font-bold rounded-xl hover:bg-k86-border transition-colors uppercase text-xs tracking-widest">Cancel</button>
+                    <button onclick="adminApp.deleteUser(${id})" class="flex-1 px-6 py-4 bg-k86-red text-white font-bold rounded-xl hover:bg-k86-red-dark transition-colors uppercase text-xs tracking-widest shadow-xl shadow-k86-red/40">Yes, Delete</button>
+                </div>
+            </div>
+        `;
+        this.openModal('Delete User', modalHtml);
+    },
+
+    async deleteUser(id) {
+        try {
+            let r = await fetch('../api/admin.php?resource=users', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            let j = await r.json();
+            if(j.success) {
+                if(window.Toast) Toast.show(j.message || 'User deleted', 'success');
+                this.closeModal();
+                this.fetchData('users');
+            }
+        } catch(e) { console.error('Delete user error', e); }
     },
 
     logout() { fetch('../api/auth.php?action=logout').then(() => window.location.href = '../'); }
