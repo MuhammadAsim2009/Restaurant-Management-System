@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitchen 86 | Cheezious Matka Fries & Fried Chicken</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = { 
@@ -159,7 +160,7 @@
             <div class="absolute bottom-10 right-10 w-48 h-48 bg-k86-amber rounded-full opacity-10 blur-3xl animate-pulse-fast" style="animation-delay: 1s;"></div>
             
             <div class="relative z-10">
-                <span class="inline-block bg-k86-red/20 text-k86-red border border-k86-red px-3 py-1 rounded-full text-sm font-bold tracking-widest mb-6 animate-bounce-slow shadow-[0_0_10px_rgba(255,32,32,0.5)]">🔥 HOT & SPICY</span>
+                <span class="inline-block bg-k86-red/20 text-k86-red border border-k86-red px-3 py-1 rounded-full text-sm font-bold tracking-widest mb-6 animate-bounce-slow shadow-[0_0_10px_rgba(255,32,32,0.5)]"><i class="fa-solid fa-fire text-k86-red mr-1"></i> HOT & SPICY</span>
                 <h1 class="text-7xl md:text-8xl font-display text-transparent bg-clip-text bg-gradient-to-r from-k86-amber via-yellow-300 to-k86-red mb-6 drop-shadow-lg transform transition-transform duration-700 hover:scale-105">BOLD. HOT. FAST.</h1>
                 <p class="text-k86-muted text-lg md:text-xl font-heading max-w-2xl mx-auto mb-10">Experience the ultimate Cheezious Matka Fries & legendary Fried Chicken in Larkana.</p>
                 <a href="javascript:void(0)" onclick="scrollToMenu()" class="inline-block bg-k86-red px-10 py-4 text-white font-bold rounded-lg text-lg transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95 group">
@@ -232,7 +233,7 @@
                 <div class="space-y-6 relative z-10 mr-0 md:mr-4">
                     <h3 class="text-3xl font-heading font-bold text-white mb-2">Drop us a line</h3>
                     <p class="text-k86-muted mb-8">Have a question, feedback, or a large event order? We'd love to hear from you.</p>
-                    <form class="space-y-5" onsubmit="event.preventDefault(); if(window.Toast) window.Toast('Message sent successfully!', 'success'); this.reset();">
+                    <form class="space-y-5" onsubmit="event.preventDefault(); if(window.Toast) window.Toast.show('Message sent successfully!', 'success'); this.reset();">
                         <div>
                             <input type="text" required placeholder="Your Name" class="w-full bg-k86-black rounded-xl px-5 py-4 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all shadow-inner">
                         </div>
@@ -326,8 +327,11 @@
                     <div>
                         <input type="email" id="login-email" required placeholder="Email Address" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all">
                     </div>
-                    <div>
-                        <input type="password" id="login-pwd" required placeholder="Password" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all">
+                    <div class="relative">
+                        <input type="password" id="login-pwd" required placeholder="Password" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all pr-12">
+                        <button type="button" class="absolute inset-y-0 right-0 px-3 flex items-center text-k86-muted hover:text-white toggle-pwd" data-target="login-pwd" title="Toggle Password">
+                            <i class="fa-solid fa-eye border border-k86-border px-2 py-1.5 rounded"></i>
+                        </button>
                     </div>
                     <button type="submit" class="w-full bg-k86-red py-3 rounded-lg font-bold tracking-wider hover:bg-red-500 transition-colors shadow-lg shadow-k86-red/20 active:scale-95">LOGIN</button>
                     <p class="text-center text-k86-muted mt-4">
@@ -346,7 +350,13 @@
                         <input type="email" id="reg-email" required placeholder="Email Address" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all">
                     </div>
                     <div>
-                        <input type="password" id="reg-pwd" required placeholder="Password" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all">
+                        <input type="tel" id="reg-phone" placeholder="Phone Number" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all">
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="reg-pwd" required placeholder="Password" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all pr-12">
+                        <button type="button" class="absolute inset-y-0 right-0 px-3 flex items-center text-k86-muted hover:text-white toggle-pwd" data-target="reg-pwd" title="Toggle Password">
+                            <i class="fa-solid fa-eye border border-k86-border px-2 py-1.5 rounded"></i>
+                        </button>
                     </div>
                     <button type="submit" class="w-full bg-k86-red py-3 rounded-lg font-bold tracking-wider hover:bg-red-500 transition-colors shadow-lg shadow-k86-red/20 active:scale-95">CREATE ACCOUNT</button>
                     <p class="text-center text-k86-muted mt-4">
@@ -360,7 +370,7 @@
     <!-- Scripts -->
     <script src="assets/js/toast.js"></script>
     <script src="assets/js/cart.js"></script>
-    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/auth.js?v=2"></script>
     <script src="assets/js/checkout.js"></script>
     <script src="assets/js/app.js"></script>
     
