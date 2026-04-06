@@ -176,21 +176,10 @@
                 <svg class="w-8 h-8 text-k86-red" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"></path></svg>
                 HOT DEALS
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-gradient-to-br from-k86-surface to-k86-red-dark/20 p-6 rounded-2xl border border-k86-border hover:border-k86-red transition-all duration-300 hover:-translate-y-2 group relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-k86-red rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
-                    <span class="absolute top-4 right-4 bg-k86-amber text-k86-black text-xs font-bold px-3 py-1 rounded-full animate-pulse-fast">SAVE 20%</span>
-                    <h3 class="text-2xl font-heading font-bold mb-2">Matka Combo</h3>
-                    <p class="text-k86-muted mb-4">Matka Fries + Zinger + Drink</p>
-                    <a href="javascript:void(0)" onclick="scrollToMenu()" class="text-k86-amber font-bold group-hover:text-white transition-colors duration-300 inline-flex items-center gap-2">Grab Deal <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                </div>
-                <div class="bg-gradient-to-br from-k86-surface to-k86-amber/20 p-6 rounded-2xl border border-k86-border hover:border-k86-amber transition-all duration-300 hover:-translate-y-2 group relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-k86-amber rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
-                    <span class="absolute top-4 right-4 bg-k86-red text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse-fast">POPULAR</span>
-                    <h3 class="text-2xl font-heading font-bold mb-2">Feast for 2</h3>
-                    <p class="text-k86-muted mb-4">2x Zinger Burger + Large Fries + 2x Drinks</p>
-                    <a href="javascript:void(0)" onclick="scrollToMenu()" class="text-k86-red font-bold group-hover:text-white transition-colors duration-300 inline-flex items-center gap-2">Grab Deal <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-                </div>
+            <div id="featured-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Skeletons -->
+                <div class="bg-k86-surface border border-k86-border p-6 rounded-2xl animate-pulse h-48"></div>
+                <div class="bg-k86-surface border border-k86-border p-6 rounded-2xl animate-pulse h-48"></div>
             </div>
         </div>
 
@@ -505,6 +494,9 @@
                     // Auto-load the menu into the inline #menu-grid
                     if(typeof this.loadMenu === 'function') {
                         this.loadMenu();
+                    }
+                    if(typeof this.loadFeatured === 'function') {
+                        this.loadFeatured();
                     }
                 }
             };

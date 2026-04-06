@@ -9,9 +9,32 @@ window.CartInterface = {
             window.AuthInterface.openLogin();
             return;
         }
-        let ex = this.items.find(i => i.id === p.id); if(ex) ex.qty++; else this.items.push({id:p.id, name:p.name, price:p.price, qty:1}); this.save(); if(window.Toast) window.Toast.show('Item added to cart!', 'success'); 
+        const type = p.isSpecialDeal ? 'deal' : 'item';
+        const cartId = `${type}_${p.id}`;
+        let ex = this.items.find(i => i.cartId === cartId); 
+        if(ex) {
+            ex.qty++; 
+        } else {
+            this.items.push({
+                cartId: cartId,
+                id: p.id,
+                type: type,
+                name: p.name, 
+                price: parseFloat(p.price), 
+                qty: 1
+            });
+        }
+        this.save(); 
+        if(window.Toast) window.Toast.show('Added to cart!', 'success'); 
     },
-    updateQty(id, d) { let i = this.items.find(i=>i.id===id); if(i) { i.qty+=d; if(i.qty<=0) this.items=this.items.filter(x=>x.id!==id); this.save(); } },
+    updateQty(cartId, d) { 
+        let i = this.items.find(i => i.cartId === cartId); 
+        if(i) { 
+            i.qty += d; 
+            if(i.qty <= 0) this.items = this.items.filter(x => x.cartId !== cartId); 
+            this.save(); 
+        } 
+    },
     getTotals() { let sub = this.items.reduce((s,i)=>s+(i.price*i.qty), 0); return {sub, total:sub}; },
     ui() {
         document.getElementById('cart-badge').innerText = this.items.reduce((s,i)=>s+i.qty, 0);

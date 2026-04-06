@@ -3,9 +3,52 @@ window.adminApp = {
     revenueChart: null,
     itemsCache: [], // Local cache for products
     usersCache: [], // Local cache for users
+    dealsCache: [], // Local cache for deals
 
-    init() { this.route(); },
+    init() { this.initPriceSync(); this.route(); },
     
+    renderTableSkeleton(tbodyId, columns = 6, rows = 5) {
+        const tbody = document.getElementById(tbodyId);
+        if(!tbody) return;
+        
+        let html = '';
+        for(let i = 0; i < rows; i++) {
+            html += `<tr class="border-b border-k86-border/50">`;
+            for(let j = 0; j < columns; j++) {
+                html += `
+                    <td class="p-6">
+                        <div class="h-4 skeleton-loader rounded-lg w-${j === 0 ? '16' : (j === 1 ? '32' : '24')} opacity-20"></div>
+                    </td>
+                `;
+            }
+            html += `</tr>`;
+        }
+        tbody.innerHTML = html;
+    },
+
+    // Global listener for dynamic deal checkboxes
+    initPriceSync() {
+        document.addEventListener('change', (e) => {
+            if (e.target.name === 'items_json[]') {
+                this.calculateOriginalPrice();
+            }
+        });
+    },
+
+    calculateOriginalPrice() {
+        const checkboxes = document.querySelectorAll('input[name="items_json[]"]:checked');
+        let total = 0;
+        checkboxes.forEach(cb => {
+            const itemId = cb.value;
+            const item = this.itemsCache.find(i => i.id == itemId);
+            if (item) total += parseFloat(item.price || 0);
+        });
+        
+        const originalPriceInput = document.getElementById('deal-original-price');
+        if (originalPriceInput) {
+            originalPriceInput.value = total;
+        }
+    },
     // Resolve image paths for admin subdirectory
     resolveImg(path) {
         if(!path) return '../assets/images/placeholder.jpg';
@@ -24,6 +67,7 @@ window.adminApp = {
     async fetchData(page) {
         try {
             if(page === 'dashboard') {
+                this.renderTableSkeleton('dash-recent-orders', 6, 5);
                 let r = await fetch('../api/admin.php?resource=dashboard'); 
                 if(r.ok) {
                     let j = await r.json();
@@ -44,31 +88,40 @@ window.adminApp = {
                 }
 
             } else if (page === 'users') {
-                const el = document.getElementById('tbl-users');
-                if(!el) return;
+                this.renderTableSkeleton('tbl-users', 5, 5);
                 let r = await fetch('../api/admin.php?resource=users');
                 if(r.ok) {
                     let j = await r.json();
                     if(j.success && j.data) {
                         this.usersCache = j.data;
-                        el.innerHTML = j.data.map(item => this.userRowTemplate(item)).join('');
+                        document.getElementById('tbl-users').innerHTML = j.data.map(item => this.userRowTemplate(item)).join('');
                     }
                 }
             } else if (page === 'items') {
-                const el = document.getElementById('tbl-items');
-                if(!el) return;
+                this.renderTableSkeleton('tbl-items', 6, 5);
                 let r = await fetch('../api/admin.php?resource=items');
                 if(r.ok) {
                     let j = await r.json();
                     if(j.success && j.data) {
                         this.itemsCache = j.data;
-                        el.innerHTML = j.data.map(item => this.itemRowTemplate(item)).join('');
+                        document.getElementById('tbl-items').innerHTML = j.data.map(item => this.itemRowTemplate(item)).join('');
                     }
                 }
             } else if (page === 'orders') {
+                this.renderTableSkeleton('tbl-orders', 6, 8);
                 this.fetchTableData('../api/orders.php?admin=1', 'tbl-orders', this.orderRowTemplate);
             } else if (page === 'categories') {
                 this.fetchTableData('../api/admin.php?resource=categories', 'list-categories', this.categoryItemTemplate);
+            } else if (page === 'deals') {
+                this.renderTableSkeleton('tbl-deals', 6, 5);
+                let r = await fetch('../api/admin.php?resource=deals');
+                if(r.ok) {
+                    let j = await r.json();
+                    if(j.success && j.data) {
+                        this.dealsCache = j.data;
+                        document.getElementById('tbl-deals').innerHTML = j.data.map(item => this.dealRowTemplate(item)).join('');
+                    }
+                }
             }
         } catch(e) { console.error('API Error', e); }
     },
@@ -316,12 +369,21 @@ window.adminApp = {
                         <textarea name="description" rows="3" placeholder="Describe the flavors..." class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none resize-none"></textarea>
                     </div>
 
-                    <div class="flex items-center justify-between p-3 bg-k86-surface2 rounded-xl border border-k86-border">
-                        <span class="text-sm text-k86-muted font-bold uppercase tracking-wider">Available immediately</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="is_available" value="1" checked class="sr-only peer">
-                            <div class="w-11 h-6 bg-k86-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-k86-red"></div>
-                        </label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-center justify-between p-3 bg-k86-surface2 rounded-xl border border-k86-border">
+                            <span class="text-xs text-k86-muted font-bold uppercase tracking-wider">Available</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_available" value="1" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-k86-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-k86-red"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-k86-surface2 rounded-xl border border-k86-border">
+                            <span class="text-xs text-k86-muted font-bold uppercase tracking-wider">Hot Deal?</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_featured" value="1" class="sr-only peer">
+                                <div class="w-11 h-6 bg-k86-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-k86-amber"></div>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex gap-3 pt-2">
@@ -436,12 +498,21 @@ window.adminApp = {
                         <textarea name="description" rows="3" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none resize-none">${item.description}</textarea>
                     </div>
 
-                    <div class="flex items-center justify-between p-3 bg-k86-surface2 rounded-xl border border-k86-border">
-                        <span class="text-sm text-k86-muted font-bold uppercase tracking-wider">Available immediately</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="is_available" value="1" ${item.is_available ? 'checked' : ''} class="sr-only peer">
-                            <div class="w-11 h-6 bg-k86-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-k86-red"></div>
-                        </label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-center justify-between p-3 bg-k86-surface2 rounded-xl border border-k86-border">
+                            <span class="text-xs text-k86-muted font-bold uppercase tracking-wider">Available</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_available" value="1" ${item.is_available ? 'checked' : ''} class="sr-only peer">
+                                <div class="w-11 h-6 bg-k86-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-k86-red"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-k86-surface2 rounded-xl border border-k86-border">
+                            <span class="text-xs text-k86-muted font-bold uppercase tracking-wider">Hot Deal?</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_featured" value="1" ${item.is_featured ? 'checked' : ''} class="sr-only peer">
+                                <div class="w-11 h-6 bg-k86-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-k86-amber"></div>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex gap-3 pt-2">
@@ -501,6 +572,7 @@ window.adminApp = {
         
         // Manual override for checkbox if needed (FormData usually includes it only if checked)
         if(!formData.has('is_available')) formData.append('is_available', '0');
+        if(!formData.has('is_featured')) formData.append('is_featured', '0');
 
         try {
             let r = await fetch('../api/admin.php?resource=items', {
@@ -519,6 +591,339 @@ window.adminApp = {
             console.error('Save error', e);
             if(window.Toast) Toast.show('Connection error', 'error');
         }
+    },
+    
+    // --- Deals Management ---
+    
+    async ensureItemsLoaded() {
+        if (!this.itemsCache || !this.itemsCache.length) {
+            try {
+                let r = await fetch('../api/admin.php?resource=items');
+                let j = await r.json();
+                if (j.success) this.itemsCache = j.data;
+            } catch (e) { console.error('Cache load error', e); }
+        }
+    },
+
+    async openAddDealModal() {
+        await this.ensureItemsLoaded();
+        const formHtml = `
+            <div class="space-y-6">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-k86-red/10 rounded-full flex items-center justify-center text-k86-red">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-heading font-bold text-white">Add New Deal</h3>
+                        <p class="text-xs text-k86-muted uppercase tracking-tighter">Create an irresistible offer</p>
+                    </div>
+                </div>
+
+                <form id="form-add-deal" class="space-y-4" onsubmit="adminApp.saveDeal(event)">
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Deal Name</label>
+                        <input type="text" name="name" required placeholder="e.g. Matka Combo for 2" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Sale Price (PKR)</label>
+                            <input type="number" name="price" required placeholder="850" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none font-price">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Original Price (Strike)</label>
+                            <input type="number" name="original_price" id="deal-original-price" placeholder="1100" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none font-price" readonly>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Included Menu Items</label>
+                        <div class="w-full bg-k86-black border border-k86-border rounded-xl p-4 max-h-48 overflow-y-auto space-y-2 custom-scrollbar">
+                            ${this.itemsCache && this.itemsCache.length ? 
+                                this.itemsCache.map(i => `
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" name="items_json[]" value="${i.id}" class="w-4 h-4 rounded border-k86-border bg-k86-surface text-k86-red focus:ring-k86-red">
+                                        <span class="text-sm text-k86-muted group-hover:text-white transition-colors">${i.name} <small class="text-[10px] opacity-50">(PKR ${parseFloat(i.price)})</small></span>
+                                    </label>
+                                `).join('') : '<p class="text-[10px] text-k86-muted italic text-center py-2">No items found. Go to Menu Manager first.</p>'
+                            }
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Valid Until (Optional)</label>
+                            <input type="date" name="valid_until" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Deal Image</label>
+                        <input type="file" name="deal_image" accept="image/*" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none file:bg-k86-surface2 file:border-0 file:text-white file:text-xs file:font-bold file:px-3 file:py-1 file:rounded-lg file:mr-3 cursor-pointer">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Description</label>
+                        <textarea name="description" rows="3" placeholder="What's in the box? (e.g. 2x Zinger, 1x Fries...)" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none resize-none"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-k86-surface2 rounded-xl border border-k86-border">
+                        <span class="text-xs text-k86-muted font-bold uppercase tracking-wider">Active Status</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="is_active" value="1" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-k86-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-k86-red"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="adminApp.closeModal()" class="flex-1 px-6 py-3 bg-k86-surface2 text-k86-muted font-bold rounded-xl hover:bg-k86-border transition-colors uppercase text-xs tracking-widest">Cancel</button>
+                        <button type="submit" class="flex-1 px-6 py-3 bg-k86-red text-white font-bold rounded-xl hover:bg-k86-red-dark transition-colors uppercase text-xs tracking-widest shadow-lg shadow-k86-red/20 shadow-inner">Launch Deal</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        this.openModal('Add New Deal', formHtml);
+    },
+
+    async viewDeal(id) {
+        const deal = this.dealsCache.find(d => d.id == id);
+        if(!deal) return;
+        const detailHtml = `
+            <div class="space-y-6">
+                <div class="relative w-full h-56 rounded-2xl overflow-hidden border border-k86-border shadow-2xl">
+                    <img src="${this.resolveImg(deal.image)}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4">
+                        <span class="bg-k86-amber text-k86-black px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Special Deal</span>
+                        <h3 class="text-2xl font-heading font-bold text-white mt-1 uppercase">${deal.name}</h3>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-k86-surface2 p-4 rounded-xl border border-k86-border">
+                        <p class="text-[10px] uppercase font-bold text-k86-muted mb-1">Sale Price</p>
+                        <p class="text-xl font-price font-bold text-k86-amber">PKR ${parseFloat(deal.price).toLocaleString()}</p>
+                    </div>
+                    <div class="bg-k86-surface2 p-4 rounded-xl border border-k86-border">
+                        <p class="text-[10px] uppercase font-bold text-k86-muted mb-1">Original Price</p>
+                        <p class="text-xl font-price font-bold text-k86-muted line-through">PKR ${deal.original_price ? parseFloat(deal.original_price).toLocaleString() : '-'}</p>
+                    </div>
+                </div>
+                <p class="text-sm text-white/80 leading-relaxed bg-k86-black p-4 rounded-xl border border-k86-border italic">"${deal.description || 'No description'}"</p>
+                <button onclick="adminApp.closeModal()" class="w-full px-6 py-3 bg-k86-surface2 text-white font-bold rounded-xl hover:bg-k86-border transition-colors uppercase text-xs tracking-widest border border-k86-border">Done</button>
+            </div>
+        `;
+        this.openModal('Deal Preview', detailHtml);
+    },
+
+    async editDeal(id) {
+        const deal = this.dealsCache.find(d => d.id == id);
+        if(!deal) return;
+        const formHtml = `
+            <div class="space-y-6">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-k86-amber/10 rounded-full flex items-center justify-center text-k86-amber">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-heading font-bold text-white uppercase">Update Deal</h3>
+                        <p class="text-xs text-k86-muted tracking-wide">ID: #DEAL-${deal.id}</p>
+                    </div>
+                </div>
+
+                <form id="form-edit-deal" class="space-y-4" onsubmit="adminApp.saveDeal(event)">
+                    <input type="hidden" name="id" value="${deal.id}">
+                    <input type="hidden" name="existing_image" value="${deal.image || ''}">
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Deal Name</label>
+                        <input type="text" name="name" value="${deal.name}" required class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Sale Price (PKR)</label>
+                            <input type="number" name="price" value="${deal.price}" required class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none font-price">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Original Price</label>
+                            <input type="number" name="original_price" id="deal-original-price" value="${deal.original_price || ''}" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none font-price" readonly>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Included Menu Items</label>
+                        <div class="w-full bg-k86-black border border-k86-border rounded-xl p-4 max-h-48 overflow-y-auto space-y-2 custom-scrollbar">
+                            ${this.itemsCache && this.itemsCache.length ? 
+                                this.itemsCache.map(i => {
+                                    let itemsInDeal = [];
+                                    try { itemsInDeal = JSON.parse(deal.items_json || '[]'); } catch(e) {}
+                                    const isChecked = itemsInDeal.includes(String(i.id)) || itemsInDeal.includes(Number(i.id));
+                                    return `
+                                        <label class="flex items-center gap-3 cursor-pointer group">
+                                            <input type="checkbox" name="items_json[]" value="${i.id}" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded border-k86-border bg-k86-surface text-k86-red focus:ring-k86-red">
+                                            <span class="text-sm text-k86-muted group-hover:text-white transition-colors">${i.name}</span>
+                                        </label>
+                                    `;
+                                }).join('') : '<p class="text-[10px] text-k86-muted italic">No items found.</p>'
+                            }
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Valid Until</label>
+                            <input type="date" name="valid_until" value="${deal.valid_until || ''}" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Change Image (Optional)</label>
+                        <input type="file" name="deal_image" accept="image/*" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none file:bg-k86-surface2 file:border-0 file:text-white file:text-xs file:font-bold file:px-3 file:py-1 file:rounded-lg file:mr-3 cursor-pointer">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Description</label>
+                        <textarea name="description" rows="3" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none resize-none">${deal.description}</textarea>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-k86-surface2 rounded-xl border border-k86-border">
+                        <span class="text-xs text-k86-muted font-bold uppercase tracking-wider">Active Status</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="is_active" value="1" ${deal.is_active ? 'checked' : ''} class="sr-only peer">
+                            <div class="w-11 h-6 bg-k86-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-k86-red"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="adminApp.closeModal()" class="flex-1 px-6 py-3 bg-k86-surface2 text-k86-muted font-bold rounded-xl hover:bg-k86-border transition-colors uppercase text-xs tracking-widest">Cancel</button>
+                        <button type="submit" class="flex-1 px-6 py-3 bg-k86-amber text-white font-bold rounded-xl hover:bg-yellow-600 transition-colors uppercase text-xs tracking-widest shadow-lg shadow-k86-amber/20 shadow-inner">Update Deal</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        this.openModal('Edit Deal', formHtml);
+    },
+
+    async saveDeal(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        
+        if(!formData.has('is_active')) formData.append('is_active', '0');
+        
+        // Convert multi-select checkboxes to items_json array for API
+        const selectedItems = Array.from(form.querySelectorAll('input[name="items_json[]"]:checked')).map(cb => cb.value);
+        
+        // For standard fetch with JSON, we might need to convert FormData
+        // But our API handles both. Let's send selectedItems as a field.
+        // PHP will see items_json[] as an array in $_POST if we use FormData.
+        
+        try {
+            let r = await fetch('../api/admin.php?resource=deals', { method: 'POST', body: formData });
+            let j = await r.json();
+            if(j.success) {
+                if(window.Toast) Toast.show(j.message || 'Deal saved!', 'success');
+                this.closeModal();
+                this.fetchData('deals');
+            } else {
+                if(window.Toast) Toast.show(j.message || 'Error saving deal', 'error');
+            }
+        } catch(e) { console.error('Save deal error', e); }
+    },
+
+    confirmDeleteDeal(id) {
+        const deal = this.dealsCache.find(d => d.id == id);
+        if(!deal) return;
+        const confirmHtml = `
+            <div class="text-center space-y-6 py-4">
+                <div class="w-20 h-20 bg-k86-danger/10 rounded-full flex items-center justify-center text-k86-danger mx-auto animate-pulse">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-heading font-bold text-white uppercase tracking-wider">Delete this Deal?</h3>
+                    <p class="text-k86-muted mt-2 px-6">You are deleting <span class="text-white font-bold">"${deal.name}"</span>. This will remove it from the homepage instantly.</p>
+                </div>
+                <div class="flex gap-3 px-4">
+                    <button onclick="adminApp.closeModal()" class="flex-1 px-6 py-4 bg-k86-surface2 text-white font-bold rounded-xl hover:bg-k86-border transition-colors uppercase text-xs tracking-widest">Keep it</button>
+                    <button onclick="adminApp.deleteDeal(${id})" class="flex-1 px-6 py-4 bg-k86-red text-white font-bold rounded-xl hover:bg-k86-red-dark transition-colors uppercase text-xs tracking-widest shadow-xl shadow-k86-red/40">Yes, Delete</button>
+                </div>
+            </div>
+        `;
+        this.openModal('Delete Confirmation', confirmHtml);
+    },
+
+    async deleteDeal(id) {
+        try {
+            let r = await fetch('../api/admin.php?resource=deals', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+            let j = await r.json();
+            if(j.success) {
+                if(window.Toast) Toast.show(j.message || 'Deleted successfully', 'success');
+                this.closeModal();
+                this.fetchData('deals');
+            }
+        } catch(e) { console.error('Delete error', e); }
+    },
+
+    dealRowTemplate(d) {
+        return `
+            <tr class="group hover:bg-k86-surface2/50 transition-colors">
+                <td class="p-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl overflow-hidden bg-k86-black border border-k86-border shrink-0">
+                            <img src="${this.resolveImg(d.image)}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-bold text-white group-hover:text-k86-red transition-colors uppercase tracking-wider">${d.name}</p>
+                            <p class="text-[10px] text-k86-muted uppercase font-bold tracking-tighter truncate max-w-[200px]">${d.description || 'No description'}</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="p-6">
+                    <div class="flex flex-col">
+                        <p class="text-k86-amber font-price text-xl font-bold leading-none">PKR ${parseFloat(d.price).toLocaleString()}</p>
+                        ${d.original_price ? `<p class="text-[10px] text-k86-muted line-through font-bold mt-1">PKR ${parseFloat(d.original_price).toLocaleString()}</p>` : ''}
+                    </div>
+                </td>
+                <td class="p-6">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-white font-bold text-xs uppercase tracking-tighter truncate max-w-[150px]">
+                            ${(() => {
+                                try {
+                                    const ids = JSON.parse(d.items_json || '[]');
+                                    if(!ids.length) return 'N/A';
+                                    const names = ids.map(id => {
+                                        const item = this.itemsCache.find(i => i.id == id);
+                                        return item ? item.name : null;
+                                    }).filter(n => n);
+                                    return names.length > 2 ? `${names.slice(0, 2).join(', ')} +${names.length-2} more` : names.join(', ');
+                                } catch(e) { return 'N/A'; }
+                            })()}
+                        </span>
+                        <span class="text-[10px] text-k86-muted uppercase font-bold italic">${d.valid_until ? 'Ends: ' + d.valid_until : 'No Expiry'}</span>
+                    </div>
+                </td>
+                <td class="p-6">
+                    <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${d.is_active ? 'bg-k86-success/10 text-k86-success border-k86-success/20' : 'bg-k86-danger/10 text-k86-danger border-k86-danger/20'}">
+                        ${d.is_active ? 'Active' : 'Paused'}
+                    </span>
+                </td>
+                <td class="p-6 text-right space-x-1">
+                    <button onclick="adminApp.viewDeal(${d.id})" title="View Details" class="text-k86-muted hover:text-white transition-colors p-2 rounded-lg hover:bg-k86-surface2 cursor-pointer">
+                        <i class="fa-solid fa-eye text-sm"></i>
+                    </button>
+                    <button onclick="adminApp.editDeal(${d.id})" title="Edit Deal" class="text-k86-muted hover:text-k86-amber transition-colors p-2 rounded-lg hover:bg-k86-amber/10 cursor-pointer">
+                        <i class="fa-solid fa-pen text-sm"></i>
+                    </button>
+                    <button onclick="adminApp.confirmDeleteDeal(${d.id})" title="Delete Deal" class="text-k86-danger/50 hover:text-k86-danger transition-colors p-2 rounded-lg hover:bg-k86-danger/10 cursor-pointer">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
     },
 
     // --- Helpers ---
@@ -602,10 +1007,11 @@ window.adminApp = {
                 </td>
                 <td class="p-4 text-k86-muted font-semibold text-xs">${i.category_name || 'Uncategorized'}</td>
                 <td class="p-4 text-k86-amber font-price text-lg font-bold">PKR ${parseFloat(i.price).toLocaleString()}</td>
-                <td class="p-4">
+                <td class="p-4 flex flex-col gap-1 items-start">
                     <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${i.is_available ? 'bg-k86-success/10 text-k86-success border-k86-success/20' : 'bg-k86-danger/10 text-k86-danger border-k86-danger/20'}">
                         ${i.is_available ? 'Available' : 'Hidden'}
                     </span>
+                    ${i.is_featured ? '<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-k86-amber/10 text-k86-amber border-k86-amber/20">🔥 Hot Deal</span>' : ''}
                 </td>
                 <td class="p-4 text-right space-x-1">
                     <button onclick="adminApp.viewMenuItem(${i.id})" title="View Details" class="text-k86-muted hover:text-white transition-colors p-2 rounded-lg hover:bg-k86-surface2 cursor-pointer">

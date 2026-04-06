@@ -11,7 +11,11 @@ try {
     // Fetch as associative array by default to simplify response serialization
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    // In production, we shouldn't expose the raw connection error message.
-    die("Database connection failed. Please try again later.");
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database connection failed: ' . $e->getMessage()
+    ]);
+    exit;
 }
 ?>
