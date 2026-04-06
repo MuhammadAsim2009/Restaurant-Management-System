@@ -124,15 +124,25 @@ try {
 
         case 'categories':
             if ($method === 'GET') {
-                jsonResponse(true, $pdo->query("SELECT * FROM categories ORDER BY display_order")->fetchAll());
+                $stmt = $pdo->query("SELECT c.*, COUNT(m.id) as item_count FROM categories c LEFT JOIN menu_items m ON m.category_id = c.id GROUP BY c.id ORDER BY c.display_order");
+                jsonResponse(true, $stmt->fetchAll());
             } elseif ($method === 'POST') {
-                $stmt = $pdo->prepare("INSERT INTO categories (name, display_order, icon) VALUES (?, ?, ?)");
-                $stmt->execute([$data['name'], $data['display_order'] ?? 0, $data['icon'] ?? '']);
-                jsonResponse(true, null, 'Category added');
+                $id = $data['id'] ?? null;
+                if ($id) {
+                    // UPDATE existing category
+                    $stmt = $pdo->prepare("UPDATE categories SET name=?, display_order=?, icon=? WHERE id=?");
+                    $stmt->execute([$data['name'], $data['display_order'] ?? 0, $data['icon'] ?? '', $id]);
+                    jsonResponse(true, null, 'Category updated successfully');
+                } else {
+                    // INSERT new category
+                    $stmt = $pdo->prepare("INSERT INTO categories (name, display_order, icon) VALUES (?, ?, ?)");
+                    $stmt->execute([$data['name'], $data['display_order'] ?? 0, $data['icon'] ?? '']);
+                    jsonResponse(true, ['id' => $pdo->lastInsertId()], 'Category added successfully');
+                }
             } elseif ($method === 'DELETE') {
                  $stmt = $pdo->prepare("DELETE FROM categories WHERE id=?");
                  $stmt->execute([$data['id']]);
-                 jsonResponse(true, null, 'Category deleted');
+                 jsonResponse(true, null, 'Category deleted successfully');
             }
             break;
 
