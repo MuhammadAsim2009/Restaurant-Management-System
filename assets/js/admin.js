@@ -1041,10 +1041,12 @@ window.adminApp = {
         return `<tr class="hover:bg-k86-surface2/50 transition-colors group"><td class="p-4 font-bold text-white group-hover:text-k86-red transition-colors">#ORD-${o.id}</td><td class="p-4">${o.customer_name}</td><td class="p-4"><span class="text-k86-muted bg-k86-surface border border-k86-border px-2 py-1 rounded text-xs uppercase">${o.order_type}</span></td><td class="p-4 font-price text-k86-amber tracking-wide text-base">PKR ${o.total}</td><td class="p-4">${this.getStatusBadge(o.status)}</td><td class="p-4 text-right"><button class="text-k86-red hover:text-k86-red-dark font-bold text-xs uppercase tracking-wider">Update</button></td></tr>`;
     },
     resolveCatIcon(icon) {
-        // FA keys are lowercase ASCII letters, numbers, and hyphens only
-        // Emojis and old data will fail this test and fall back to a default
-        if (!icon) return 'layer-group';
-        return /^[a-z0-9-]+$/.test(icon.trim()) ? icon.trim() : 'layer-group';
+        if (!icon) return 'fa-solid fa-layer-group';
+        icon = icon.trim();
+        // If it already contains space and starts with fa-, fas, fab, far, assume it's a full FA class
+        if (/^(fa-|fas |fab |far |fal |fad )/.test(icon)) return icon;
+        // Otherwise, if it's just the icon name (like burger), prepend fa-solid fa-
+        return /^[a-z0-9-]+$/.test(icon) ? 'fa-solid fa-' + icon : 'fa-solid fa-layer-group';
     },
 
     renderCategoryGrid(categories) {
@@ -1068,7 +1070,7 @@ window.adminApp = {
                 <div class="flex items-start justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-k86-black rounded-xl flex items-center justify-center border border-k86-border group-hover:border-k86-red/30 transition-colors shrink-0">
-                            <i class="fa-solid fa-${this.resolveCatIcon(c.icon)} text-xl text-k86-red"></i>
+                            <i class="${this.resolveCatIcon(c.icon)} text-xl text-k86-red"></i>
                         </div>
                         <div>
                             <h3 class="font-heading font-bold text-white text-lg leading-tight">${c.name}</h3>
@@ -1111,7 +1113,19 @@ window.adminApp = {
                         <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Category Name</label>
                         <input type="text" name="name" required placeholder="e.g. Burgers" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none">
                     </div>
-                    ${this.renderIconPicker('')}
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Category Icon</label>
+                        <input type="hidden" name="icon" id="cat-icon-input" value="fa-solid fa-layer-group">
+                        <button type="button" onclick="adminApp.openIconPicker((iconClass) => { document.getElementById('cat-icon-input').value = iconClass; document.getElementById('cat-icon-preview').className = iconClass + ' text-k86-red'; document.getElementById('cat-icon-preview-name').textContent = iconClass; })" class="w-full flex items-center justify-between bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white hover:border-k86-red transition-all cursor-pointer group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-k86-surface2 border border-k86-border flex items-center justify-center group-hover:border-k86-red/30 transition-colors">
+                                    <i id="cat-icon-preview" class="fa-solid fa-layer-group text-k86-red"></i>
+                                </div>
+                                <span id="cat-icon-preview-name" class="font-mono text-xs text-k86-muted group-hover:text-white transition-colors">fa-solid fa-layer-group</span>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-k86-muted group-hover:text-k86-red transition-colors flex items-center gap-1">Change <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                        </button>
+                    </div>
                     <div class="space-y-1">
                         <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Sort Order</label>
                         <input type="number" name="display_order" placeholder="1" min="0" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none font-price">
@@ -1124,7 +1138,6 @@ window.adminApp = {
             </div>
         `;
         this.openModal('Add Category', formHtml);
-        setTimeout(() => this.loadFAIcons(), 80);
     },
 
     editCategory(id) {
@@ -1149,7 +1162,19 @@ window.adminApp = {
                         <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Category Name</label>
                         <input type="text" name="name" value="${cat.name}" required class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none">
                     </div>
-                    ${this.renderIconPicker(cat.icon || '')}
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Category Icon</label>
+                        <input type="hidden" name="icon" id="cat-icon-input" value="${this.resolveCatIcon(cat.icon)}">
+                        <button type="button" onclick="adminApp.openIconPicker((iconClass) => { document.getElementById('cat-icon-input').value = iconClass; document.getElementById('cat-icon-preview').className = iconClass + ' text-k86-red'; document.getElementById('cat-icon-preview-name').textContent = iconClass; }, '${this.resolveCatIcon(cat.icon)}')" class="w-full flex items-center justify-between bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white hover:border-k86-red transition-all cursor-pointer group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-k86-surface2 border border-k86-border flex items-center justify-center group-hover:border-k86-red/30 transition-colors">
+                                    <i id="cat-icon-preview" class="${this.resolveCatIcon(cat.icon)} text-k86-red"></i>
+                                </div>
+                                <span id="cat-icon-preview-name" class="font-mono text-xs text-k86-muted group-hover:text-white transition-colors">${this.resolveCatIcon(cat.icon)}</span>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-k86-muted group-hover:text-k86-red transition-colors flex items-center gap-1">Change <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                        </button>
+                    </div>
                     <div class="space-y-1">
                         <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Sort Order</label>
                         <input type="number" name="display_order" value="${cat.display_order}" min="0" class="w-full bg-k86-black border border-k86-border rounded-xl px-4 py-3 text-white focus:border-k86-red transition-all outline-none font-price">
@@ -1162,7 +1187,6 @@ window.adminApp = {
             </div>
         `;
         this.openModal('Edit Category', formHtml);
-        setTimeout(() => this.loadFAIcons(), 80);
     },
 
     async saveCategory(e) {
@@ -1370,149 +1394,165 @@ window.adminApp = {
         ];
     },
 
-    renderIconPicker(selectedIcon) {
-        const icons = this.getCategoryIcons();
-        const current = selectedIcon || '';
-        const previewIcon = current || 'layer-group';
-        const defaultBtns = icons.map(i => this.iconPickerBtnHtml(i.key, current, i.label)).join('');
-        return `
-            <div class="space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Icon</label>
-                    <div class="flex items-center gap-2 bg-k86-black border border-k86-border rounded-lg px-3 py-1.5">
-                        <i class="fa-solid fa-${previewIcon} text-k86-red text-sm" id="cat-icon-preview"></i>
-                        <span class="text-[10px] text-k86-muted font-mono" id="cat-icon-preview-name">${current || 'none selected'}</span>
-                    </div>
-                </div>
-                <input type="hidden" name="icon" id="cat-icon-input" value="${current}">
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-k86-muted text-xs pointer-events-none"></i>
-                    <input type="text" id="cat-icon-search" oninput="adminApp.filterIcons(this.value)" autocomplete="off" placeholder="Search all Font Awesome icons..." class="w-full bg-k86-black border border-k86-border rounded-xl pl-8 pr-4 py-2.5 text-sm text-white focus:border-k86-red transition-all outline-none placeholder-k86-muted">
-                </div>
-                <p id="cat-icon-status" class="text-[10px] text-k86-muted ml-1">Showing ${icons.length} popular icons — type to search all</p>
-                <div id="cat-icon-picker" class="grid grid-cols-6 gap-1.5 bg-k86-black border border-k86-border rounded-xl p-3 max-h-44 overflow-y-auto custom-scrollbar">
-                    ${defaultBtns}
-                </div>
-            </div>
-        `;
+    openIconPicker(callback, currentVal) {
+        this.iconPickerCallback = callback;
+        this.iconPickerCurrent = currentVal || '';
+        const modal = document.getElementById('icon-picker-modal');
+        const body = document.getElementById('icon-picker-body');
+        const searchInput = document.getElementById('icon-picker-search');
+        if(searchInput) searchInput.value = '';
+        if(modal) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                body.classList.remove('scale-95', 'opacity-0');
+                body.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            this.loadFAIcons();
+            setTimeout(() => { if(searchInput) searchInput.focus(); }, 100);
+        }
     },
 
-    iconPickerBtnHtml(key, selectedKey, label) {
-        const isSelected = key === selectedKey;
+    closeIconPicker() {
+        const modal = document.getElementById('icon-picker-modal');
+        const body = document.getElementById('icon-picker-body');
+        if(modal && body) {
+            body.classList.remove('scale-100', 'opacity-100');
+            body.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    },
+
+    iconPickerBtnHtml(fullClass, isSelected) {
+        const displayName = fullClass.includes('fa-') ? fullClass.split('fa-').pop().replace(/-/g, ' ') : fullClass;
         return `<button type="button"
-            data-icon="${key}"
-            onclick="adminApp.selectCatIcon('${key}')"
-            title="${label || key}"
-            class="cat-icon-btn w-full aspect-square flex items-center justify-center rounded-lg border transition-all text-base ${isSelected ? 'border-k86-red bg-k86-red/10 text-k86-red' : 'border-k86-border text-k86-muted hover:border-k86-red/40 hover:text-white'}">
-            <i class="fa-solid fa-${key}"></i>
+            data-icon="${fullClass}"
+            onclick="adminApp.selectIconPickerVal('${fullClass}')"
+            title="${displayName}"
+            class="cat-icon-btn w-full aspect-square flex flex-col items-center justify-center rounded-xl border transition-all text-base gap-2 group hover:scale-105 ${isSelected ? 'border-k86-red bg-k86-red text-white shadow-lg shadow-k86-red/30' : 'border-k86-border text-k86-muted hover:border-k86-red/70 hover:bg-k86-surface2 hover:text-white'}">
+            <i class="${fullClass} text-2xl group-hover:drop-shadow-[0_0_8px_rgba(255,32,32,0.8)] transition-all"></i>
+            <span class="text-[9px] uppercase tracking-wider font-bold opacity-70 truncate px-1 w-full text-center">${displayName}</span>
         </button>`;
     },
 
     async loadFAIcons() {
-        if (this.faIconsCache !== null || this.faIconsLoading) return;
+        if (this.faIconsCache !== null || this.faIconsLoading) {
+            this.filterIconPicker('');
+            return;
+        }
         this.faIconsLoading = true;
 
         const statusEl = document.getElementById('cat-icon-status');
         if (statusEl) statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Loading Font Awesome icons...';
 
-        const urls = [
-            'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.1/metadata/icons.json',
-            'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/metadata/icons.json',
-            'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/metadata/icons.json',
-        ];
+        const cssUrl = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+        let cssText = '';
+        try {
+            const r = await fetch(cssUrl);
+            if (r.ok) cssText = await r.text();
+        } catch(e) { console.warn('FA CSS fetch failed:', cssUrl); }
 
-        let data = null;
-        for (const url of urls) {
-            try {
-                const r = await fetch(url);
-                if (r.ok) { data = await r.json(); break; }
-            } catch(e) { console.warn('FA CDN failed:', url); }
-        }
-
-        if (data) {
+        if (cssText) {
             this.faIconsCache = {};
-            for (const [name, info] of Object.entries(data)) {
-                // Include ALL icons that have any solid style listed (free or otherwise)
-                // This gives the user access to the complete solid icon set
-                const allStyles = [
-                    ...(info.free || []),
-                    ...(info.styles || []),
-                    ...(info.familyStylesByLicense?.free?.map(f => f.style) || [])
-                ];
-                if (allStyles.includes('solid') || allStyles.length === 0) {
-                    this.faIconsCache[name] = [name, ...(info.search?.terms || [])].map(t => t.toLowerCase());
-                }
-            }
+            const parts = cssText.split('--fa-family-brands');
+            const solidPart = parts[0];
+            const brandsPart = parts[1] || '';
+
+            const processPart = (part, prefix) => {
+                const rules = part.split('}');
+                rules.forEach(rule => {
+                    if (rule.includes('--fa:"') || rule.includes('--fa:\'') || rule.includes('content:"') || rule.includes('content:\'')) {
+                        const selectorPart = rule.split('{')[0];
+                        if (selectorPart && selectorPart.includes('.fa-')) {
+                            const names = selectorPart.match(/\.fa-([a-zA-Z0-9-]+)/g);
+                            if (names) {
+                                names.forEach(n => {
+                                    const name = n.replace('.fa-', '');
+                                    const fullClass = `${prefix} fa-${name}`;
+                                    this.faIconsCache[fullClass] = [name, name.replace(/-/g, ' ')];
+                                });
+                            }
+                        }
+                    }
+                });
+            };
+
+            processPart(solidPart, 'fa-solid');
+            if (brandsPart) processPart(brandsPart, 'fa-brands');
+
             const count = Object.keys(this.faIconsCache).length;
-            if (statusEl) statusEl.textContent = `${count} icons ready — type to search`;
+            if (statusEl) statusEl.textContent = `Search library of ${count} icons`;
         } else {
-            // All URLs failed — fall back to curated list
             this.faIconsCache = {};
             this.getCategoryIcons().forEach(i => {
-                this.faIconsCache[i.key] = [i.key, i.label.toLowerCase()];
+                this.faIconsCache[`fa-solid fa-${i.key}`] = [i.key, i.label.toLowerCase()];
             });
             if (statusEl) statusEl.textContent = 'Search unavailable — showing defaults';
         }
 
+
         this.faIconsLoading = false;
-        const query = document.getElementById('cat-icon-search')?.value || '';
-        this.filterIcons(query); // Re-render picker with loaded data
+        const query = document.getElementById('icon-picker-search')?.value || '';
+        this.filterIconPicker(query);
     },
 
-    filterIcons(query) {
-        const picker = document.getElementById('cat-icon-picker');
-        const statusEl = document.getElementById('cat-icon-status');
-        if (!picker) return;
+    filterIconsDebouncer: null,
+    filterIconPicker(query) {
+        clearTimeout(this.filterIconsDebouncer);
+        this.filterIconsDebouncer = setTimeout(() => {
+            const picker = document.getElementById('icon-picker-grid');
+            const empty = document.getElementById('icon-picker-empty');
+            const clearBtn = document.getElementById('icon-picker-clear');
+            
+            if (!picker) return;
+            if(clearBtn) clearBtn.style.display = (query && query.trim().length > 0) ? 'block' : 'none';
 
-        const current = document.getElementById('cat-icon-input')?.value || '';
+            const current = this.iconPickerCurrent || '';
+            const limit = 100;
 
-        if (!query || query.length === 0) {
-            if (this.faIconsCache && Object.keys(this.faIconsCache).length > 0) {
-                // Show first 72 icons from full FA set
-                const allKeys = Object.keys(this.faIconsCache);
-                picker.innerHTML = allKeys.slice(0, 72).map(k => this.iconPickerBtnHtml(k, current, k)).join('');
-                if (statusEl) statusEl.textContent = `${allKeys.length} total icons — type to filter`;
-            } else {
-                // FA not loaded yet, show curated
-                const defaults = this.getCategoryIcons();
-                picker.innerHTML = defaults.map(i => this.iconPickerBtnHtml(i.key, current, i.label)).join('');
-                if (statusEl) statusEl.textContent = `Showing ${defaults.length} popular icons — type to search all`;
+            if (this.faIconsCache === null && !this.faIconsLoading) {
+                this.loadFAIcons();
+                picker.innerHTML = `<div class="col-span-full py-4 text-center text-k86-muted text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading icons...</div>`;
+                return;
             }
-            return;
-        }
 
-        if (this.faIconsCache === null) {
-            if (!this.faIconsLoading) this.loadFAIcons();
-            picker.innerHTML = `<div class="col-span-6 py-4 text-center text-k86-muted text-xs"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Loading icons…</div>`;
-            return;
-        }
+            let resultsKeys = [];
 
-        const q = query.toLowerCase();
-        const results = Object.entries(this.faIconsCache)
-            .filter(([, terms]) => terms.some(t => t.includes(q)))
-            .slice(0, 72);
+            if (!query || query.length === 0) {
+                if (this.faIconsCache && Object.keys(this.faIconsCache).length > 0) {
+                    const defaultKeys = this.getCategoryIcons().map(i => `fa-solid fa-${i.key}`);
+                    resultsKeys = defaultKeys.filter(k => this.faIconsCache[k]);
+                    const extraKeys = Object.keys(this.faIconsCache).filter(k => !resultsKeys.includes(k)).slice(0, limit - resultsKeys.length);
+                    resultsKeys = resultsKeys.concat(extraKeys);
+                } else {
+                    resultsKeys = this.getCategoryIcons().map(i => `fa-solid fa-${i.key}`);
+                }
+            } else {
+                const q = query.toLowerCase();
+                const results = Object.entries(this.faIconsCache || {})
+                    .filter(([name, terms]) => name.includes(q) || terms.some(t => t.includes(q)))
+                    .slice(0, limit);
+                resultsKeys = results.map(r => r[0]);
+            }
 
-        if (results.length === 0) {
-            picker.innerHTML = `<div class="col-span-6 py-6 text-center text-k86-muted text-xs"><i class="fa-solid fa-circle-question text-xl mb-2 block"></i>No icons found</div>`;
-            if (statusEl) statusEl.textContent = `No results for "${query}"`;
-            return;
-        }
-
-        picker.innerHTML = results.map(([key]) => this.iconPickerBtnHtml(key, current, key)).join('');
-        if (statusEl) statusEl.textContent = `${results.length}${results.length === 72 ? '+' : ''} result${results.length !== 1 ? 's' : ''}`;
+            if (resultsKeys.length === 0) {
+                picker.innerHTML = '';
+                if(empty) empty.classList.remove('hidden');
+            } else {
+                if(empty) empty.classList.add('hidden');
+                picker.innerHTML = resultsKeys.map(fullClass => {
+                    return this.iconPickerBtnHtml(fullClass, current === fullClass);
+                }).join('');
+            }
+        }, 150); // Debounce typing
     },
 
-    selectCatIcon(iconKey) {
-        const input = document.getElementById('cat-icon-input');
-        const preview = document.getElementById('cat-icon-preview');
-        const previewName = document.getElementById('cat-icon-preview-name');
-        if(input) input.value = iconKey;
-        if(preview) preview.className = `fa-solid fa-${iconKey} text-k86-red text-sm`;
-        if(previewName) previewName.textContent = iconKey;
-        document.querySelectorAll('#cat-icon-picker .cat-icon-btn').forEach(btn => {
-            const isSelected = btn.dataset.icon === iconKey;
-            btn.className = `cat-icon-btn w-full aspect-square flex items-center justify-center rounded-lg border transition-all text-base ${isSelected ? 'border-k86-red bg-k86-red/10 text-k86-red' : 'border-k86-border text-k86-muted hover:border-k86-red/40 hover:text-white'}`;
-        });
+    selectIconPickerVal(iconClass) {
+        if(this.iconPickerCallback) {
+            this.iconPickerCallback(iconClass);
+        }
+        this.closeIconPicker();
     },
 
     categoryItemTemplate(c) {
