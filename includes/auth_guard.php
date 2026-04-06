@@ -8,8 +8,9 @@ if (!isAdmin()) {
     if (strpos($_SERVER['REQUEST_URI'], '/api/') !== false) {
         jsonResponse(false, null, 'Unauthorized access. Admin privileges required.', 403);
     } else {
-        // Redirect to customer login for standard web requests
-        header('Location: /#login');
+        // Redirect to customer interface for standard web requests
+        // Using ../index.php because this is typically called from the admin/ directory
+        header('Location: ../index.php');
         exit;
     }
 }

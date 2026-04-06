@@ -7,6 +7,7 @@ window.AuthInterface = {
             if(d.success && d.data) {
                 this.isLoggedIn = true; 
                 this.user = d.data; 
+                if(window.CartInterface) window.CartInterface.syncWithBackend(d.data.cart_data);
             } else {
                 this.isLoggedIn = false;
                 this.user = null;
@@ -62,6 +63,7 @@ window.AuthInterface = {
                     }
                     
                     this.updateUI(); 
+                    if(window.CartInterface) window.CartInterface.syncWithBackend(this.user.cart_data);
                     this.closeModal();
                     lf.reset();
                 } else {
@@ -140,6 +142,7 @@ window.AuthInterface = {
             await fetch('api/auth.php?action=logout');
             this.isLoggedIn=false; 
             this.user=null;
+            if(window.CartInterface) window.CartInterface.clear();
             this.updateUI(); 
             if(window.location.hash==='#orders') window.location.hash='#home'; 
             if(window.Toast) window.Toast.show('Logged out successfully.', 'success');

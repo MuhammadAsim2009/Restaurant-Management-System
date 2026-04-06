@@ -161,7 +161,8 @@ function handleLogin($pdo, $data) {
             'id' => $user['id'],
             'name' => $user['name'],
             'email' => $user['email'],
-            'role' => $user['role']
+            'role' => $user['role'],
+            'cart_data' => getCartItems($pdo, $user['id'])
         ]);
 
     } catch (PDOException $e) {
@@ -174,11 +175,13 @@ function handleLogin($pdo, $data) {
  * Returns data about the currently authenticated user
  */
 function handleMe() {
+    global $pdo;
     if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
         json_success("User authenticated.", [
             'id' => $_SESSION['user_id'],
             'name' => $_SESSION['user_name'],
-            'role' => $_SESSION['user_role']
+            'role' => $_SESSION['user_role'],
+            'cart_data' => getCartItems($pdo, $_SESSION['user_id'])
         ]);
     } else {
         // Return null data gracefully for 'Not logged in' state
@@ -206,4 +209,39 @@ function handleLogout() {
     session_destroy();
 
     json_success("Logged out successfully.");
+}
+
+/**
+ * Helper to fetch cart items with details
+ */
+function getCartItems($pdo, $userId) {
+    try {
+        $stmt = $pdo->prepare("
+            (SELECT 
+                CONCAT('item_', m.id) as cartId, 
+                m.id, 
+                'item' as type, 
+                m.name, 
+                m.price, 
+                c.quantity as qty
+            FROM cart c
+            JOIN menu_items m ON c.item_id = m.id
+            WHERE c.user_id = ? AND c.item_type = 'item')
+            UNION ALL
+            (SELECT 
+                CONCAT('deal_', d.id) as cartId, 
+                d.id, 
+                'deal' as type, 
+                d.name, 
+                d.price, 
+                c.quantity as qty
+            FROM cart c
+            JOIN deals d ON c.item_id = d.id
+            WHERE c.user_id = ? AND c.item_type = 'deal')
+        ");
+        $stmt->execute([$userId, $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return [];
+    }
 }
