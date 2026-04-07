@@ -63,9 +63,9 @@ CREATE TABLE IF NOT EXISTS orders (
     payment_method ENUM('cash', 'card') DEFAULT 'cash',
     subtotal DECIMAL(8,2) NOT NULL,
     tax DECIMAL(8,2) NOT NULL,
+    delivery_fee DECIMAL(8,2) DEFAULT 0.00,
     total DECIMAL(8,2) NOT NULL,
     status ENUM('pending','confirmed','preparing','ready','delivered','cancelled') DEFAULT 'pending',
-    notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
@@ -74,12 +74,12 @@ CREATE TABLE IF NOT EXISTS order_items (
     id INT PRIMARY KEY AUTO_INCREMENT,
     order_id INT NOT NULL,
     item_id INT NULL,
+    item_type ENUM('item', 'deal') DEFAULT 'item',
     item_name VARCHAR(150) NOT NULL,
     item_price DECIMAL(8,2) NOT NULL,
     quantity INT NOT NULL,
     subtotal DECIMAL(8,2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES menu_items(id) ON DELETE SET NULL
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
 
 -- Seed Admin User 

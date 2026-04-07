@@ -4,6 +4,7 @@ window.adminApp = {
     itemsCache: [], // Local cache for products
     usersCache: [], // Local cache for users
     dealsCache: [], // Local cache for deals
+    ordersCache: [], // Local cache for orders
     categoriesCache: [], // Local cache for categories
     faIconsCache: null,   // Font Awesome full icon metadata cache
     faIconsLoading: false, // FA fetch in-flight flag
@@ -112,7 +113,14 @@ window.adminApp = {
                 }
             } else if (page === 'orders') {
                 this.renderTableSkeleton('tbl-orders', 6, 8);
-                this.fetchTableData('../api/orders.php?admin=1', 'tbl-orders', this.orderRowTemplate);
+                let r = await fetch('../api/orders.php?admin=1');
+                if(r.ok) {
+                    let j = await r.json();
+                    if(j.success && j.data) {
+                        this.ordersCache = j.data;
+                        this.renderOrdersTable(j.data);
+                    }
+                }
             } else if (page === 'categories') {
                 let r = await fetch('../api/admin.php?resource=categories');
                 if(r.ok) {
@@ -1038,7 +1046,222 @@ window.adminApp = {
         `;
     },
     orderRowTemplate(o) {
-        return `<tr class="hover:bg-k86-surface2/50 transition-colors group"><td class="p-4 font-bold text-white group-hover:text-k86-red transition-colors">#ORD-${o.id}</td><td class="p-4">${o.customer_name}</td><td class="p-4"><span class="text-k86-muted bg-k86-surface border border-k86-border px-2 py-1 rounded text-xs uppercase">${o.order_type}</span></td><td class="p-4 font-price text-k86-amber tracking-wide text-base">PKR ${o.total}</td><td class="p-4">${this.getStatusBadge(o.status)}</td><td class="p-4 text-right"><button class="text-k86-red hover:text-k86-red-dark font-bold text-xs uppercase tracking-wider">Update</button></td></tr>`;
+        const isPending = o.status.toLowerCase() === 'pending';
+        const statuses = ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'];
+        
+        const options = statuses.map(s => `
+            <option value="${s}" ${o.status.toLowerCase() === s ? 'selected' : ''}>${s.toUpperCase()}</option>
+        `).join('');
+
+        return `
+            <tr class="hover:bg-k86-surface2/50 transition-colors group">
+                <td class="p-4 font-bold text-white group-hover:text-k86-red transition-colors">#ORD-${o.id}</td>
+                <td class="p-4">
+                    <p class="font-bold text-white">${o.customer_name}</p>
+                    <p class="text-[10px] text-k86-muted uppercase font-bold">${o.phone}</p>
+                </td>
+                <td class="p-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-white bg-k86-surface border border-k86-border px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest inline-block w-fit">${o.order_type}</span>
+                        <span class="text-k86-muted text-[9px] font-bold uppercase tracking-tighter">${o.payment_method}</span>
+                    </div>
+                </td>
+                <td class="p-4 font-price text-k86-amber tracking-wide text-base font-bold">PKR ${parseFloat(o.total).toLocaleString()}</td>
+                <td class="p-4">
+                    <div class="flex items-center gap-2">
+                        ${this.getStatusBadge(o.status)}
+                        <div class="relative group/sel min-w-[120px]">
+                            <select onchange="adminApp.updateOrderStatus(${o.id}, this.value)" class="appearance-none w-full bg-k86-surface border border-k86-border/40 text-white text-[10px] font-bold uppercase rounded-xl pl-4 pr-10 py-2.5 focus:border-k86-red/60 hover:bg-k86-surface2 transition-all outline-none cursor-pointer shadow-lg group-hover/sel:shadow-k86-red/5">
+                                ${options}
+                            </select>
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center border-l border-k86-border/30 pointer-events-none group-hover/sel:border-k86-red/20 transition-all">
+                                <i class="fa-solid fa-chevron-down text-[8px] text-k86-muted group-hover/sel:text-k86-red transition-colors"></i>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="p-4 text-right">
+                    <div class="flex items-center gap-2">
+                        ${isPending ? `
+                            <button onclick="adminApp.updateOrderStatus(${o.id}, 'confirmed')" class="bg-k86-red hover:bg-k86-red-dark text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-lg shadow-k86-red/10 active:scale-95">
+                                Confirm
+                            </button>
+                        ` : ''}
+                        <button onclick="adminApp.viewOrder(${o.id})" title="View Order Details" class="p-2 text-k86-muted hover:text-white transition-colors rounded-lg hover:bg-k86-surface2 cursor-pointer">
+                            <i class="fa-solid fa-eye text-base"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    },
+
+    renderOrdersTable(orders) {
+        const tbody = document.getElementById('tbl-orders');
+        if(!tbody) return;
+        if(!orders || orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-k86-muted">No orders matching this filter.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = orders.map(o => this.orderRowTemplate(o)).join('');
+    },
+
+    async updateOrderStatus(id, newStatus) {
+        try {
+            let r = await fetch('../api/orders.php', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: newStatus })
+            });
+            let j = await r.json();
+            if(j.success) {
+                if(window.Toast) Toast.show(`Order #${id} updated to ${newStatus}`, 'success');
+                
+                // Update local cache
+                const order = this.ordersCache.find(o => o.id == id);
+                if(order) order.status = newStatus;
+                
+                // Re-render based on current filter
+                const currentFilter = document.querySelector('.filter-btn.active')?.textContent.toLowerCase().replace(' orders', '').replace('all', 'all') || 'all';
+                this.filterOrders(currentFilter);
+            }
+        } catch(e) { console.error('Status update error', e); }
+    },
+
+    filterOrders(status) {
+        // Update button visual state
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => {
+            const btnText = btn.textContent.toLowerCase().replace(' orders', '');
+            if(btnText === status || (status === 'all' && btnText === 'all')) {
+                btn.classList.add('active', 'bg-k86-red', 'text-white', 'border-k86-red');
+                btn.classList.remove('bg-k86-surface2', 'text-k86-muted', 'border-k86-border');
+            } else {
+                btn.classList.remove('active', 'bg-k86-red', 'text-white', 'border-k86-red');
+                btn.classList.add('bg-k86-surface2', 'text-k86-muted', 'border-k86-border');
+            }
+        });
+
+        const filtered = status === 'all' 
+            ? this.ordersCache 
+            : this.ordersCache.filter(o => o.status.toLowerCase() === status);
+        
+        this.renderOrdersTable(filtered);
+    },
+
+    async viewOrder(id) {
+        try {
+            // Show loading state in modal first
+            this.openModal('Loading Order...', '<div class="flex justify-center p-12"><i class="fa-solid fa-spinner fa-spin text-4xl text-k86-red"></i></div>');
+            
+            let r = await fetch(`../api/orders.php?id=${id}`);
+            let j = await r.json();
+            
+            if(!j.success || !j.data) {
+                this.openModal('Error', '<p class="text-center p-8 text-k86-danger">Failed to load order details.</p>');
+                return;
+            }
+
+            const o = j.data;
+            const itemRows = (o.items || []).map(i => `
+                <tr class="border-b border-k86-border/50">
+                    <td class="py-3 px-1">
+                        <p class="text-sm font-bold text-white">${i.item_name}</p>
+                        <p class="text-[10px] text-k86-muted uppercase font-bold tracking-widest">${i.item_type || 'item'}</p>
+                    </td>
+                    <td class="py-3 px-1 text-center font-bold text-white">${i.quantity}</td>
+                    <td class="py-3 px-1 text-right font-bold text-k86-amber">PKR ${parseFloat(i.item_price).toLocaleString()}</td>
+                    <td class="py-3 px-1 text-right font-bold text-white">PKR ${parseFloat(i.subtotal).toLocaleString()}</td>
+                </tr>
+            `).join('');
+
+            const modalHtml = `
+                <div class="space-y-6 animate-fade-in">
+                    <!-- Order Header -->
+                    <div class="flex justify-between items-start border-b border-k86-border pb-4">
+                        <div>
+                            <h3 class="text-2xl font-heading font-bold text-white">ORDER #ORD-${o.id}</h3>
+                            <p class="text-xs text-k86-muted uppercase font-bold tracking-widest mt-1">${new Date(o.created_at).toLocaleString()}</p>
+                        </div>
+                        <div class="text-right">
+                            ${this.getStatusBadge(o.status)}
+                            <p class="text-[10px] text-k86-muted uppercase font-bold mt-2">${o.payment_method} | ${o.order_type}</p>
+                        </div>
+                    </div>
+
+                    <!-- Customer Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-k86-surface2 p-4 rounded-xl border border-k86-border">
+                            <p class="text-[10px] uppercase font-bold text-k86-muted mb-2 tracking-widest">Customer Information</p>
+                            <p class="text-sm font-bold text-white">${o.customer_name}</p>
+                            <p class="text-xs text-k86-muted mt-0.5">${o.phone}</p>
+                        </div>
+                        <div class="bg-k86-surface2 p-4 rounded-xl border border-k86-border">
+                            <p class="text-[10px] uppercase font-bold text-k86-muted mb-2 tracking-widest">Delivery Address</p>
+                            <p class="text-xs text-white leading-relaxed italic">"${o.address || 'No address provided (Pickup)'}"</p>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="text-[10px] text-k86-muted uppercase font-bold tracking-widest border-b border-k86-border">
+                                <tr>
+                                    <th class="pb-2">Item</th>
+                                    <th class="pb-2 text-center">Qty</th>
+                                    <th class="pb-2 text-right">Price</th>
+                                    <th class="pb-2 text-right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemRows}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="bg-k86-black p-4 rounded-xl border border-k86-border space-y-2">
+                        <div class="flex justify-between text-xs text-k86-muted font-bold uppercase tracking-wider">
+                            <span>Subtotal</span>
+                            <span>PKR ${parseFloat(o.subtotal).toLocaleString()}</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-k86-red font-bold uppercase tracking-wider">
+                            <span>Delivery Fee</span>
+                            <span>PKR ${parseFloat(o.delivery_fee).toLocaleString()}</span>
+                        </div>
+                        <div class="pt-2 border-t border-k86-border flex justify-between items-center">
+                            <span class="text-base font-heading font-bold text-white uppercase tracking-widest">Grand Total</span>
+                            <span class="text-2xl font-price font-bold text-k86-amber">PKR ${parseFloat(o.total).toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    <!-- Footer Actions -->
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button onclick="adminApp.closeModal()" class="flex-1 bg-k86-surface2 hover:bg-k86-border text-white py-4 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all border border-k86-border active:scale-95">
+                            Close Summary
+                        </button>
+                        <button onclick="adminApp.printOrder(${o.id})" class="flex-1 bg-k86-black hover:bg-k86-surface2 text-white py-4 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all border border-k86-border flex items-center justify-center gap-3 group/pr shadow-xl active:scale-95">
+                            <i class="fa-solid fa-print text-k86-red text-base group-hover/pr:scale-110 transition-transform"></i>
+                            Print Full Invoice
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            this.openModal(`Order Details - #ORD-${o.id}`, modalHtml);
+
+        } catch(e) {
+            console.error('Order view error', e);
+            this.openModal('Error', '<p class="text-center p-8">Network error. Check console.</p>');
+        }
+    },
+
+    printOrder(id) {
+        // Open the print template in a new window
+        const printWindow = window.open(`print_order.php?id=${id}`, '_blank', 'width=800,height=900');
+        if (!printWindow) {
+            if(window.Toast) Toast.show('Please allow popups to print invoices', 'error');
+        }
     },
     resolveCatIcon(icon) {
         if (!icon) return 'fa-solid fa-layer-group';

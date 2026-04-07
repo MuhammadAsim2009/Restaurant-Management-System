@@ -265,9 +265,63 @@
                     <label class="block text-sm font-semibold text-k86-muted mb-2">Delivery Address</label>
                     <textarea id="chk-address" required placeholder="Street, Sector, City..." rows="3" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-surface2 focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all duration-300"></textarea>
                 </div>
-                <div class="bg-k86-black p-4 rounded-lg border border-k86-surface2 flex justify-between items-center mt-6">
-                    <span class="text-lg font-heading text-k86-muted">Total Amount</span>
-                    <p class="text-4xl font-price text-k86-amber drop-shadow-[0_0_5px_rgba(255,184,0,0.5)]" id="chk-total">Rs 0.00</p>
+
+                <!-- Order Type & Payment Method -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <label class="block text-sm font-semibold text-k86-muted uppercase tracking-widest">Order Type</label>
+                        <div class="flex gap-4">
+                            <label class="flex-1 cursor-pointer group">
+                                <input type="radio" name="order_type" value="delivery" checked class="hidden peer">
+                                <div class="bg-k86-black border border-k86-border p-4 rounded-xl text-center peer-checked:border-k86-red peer-checked:bg-k86-red/10 transition-all group-hover:border-k86-red/50">
+                                    <i class="fa-solid fa-truck-fast mb-2 block text-xl"></i>
+                                    <span class="text-xs font-bold uppercase">Delivery</span>
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer group">
+                                <input type="radio" name="order_type" value="pickup" class="hidden peer">
+                                <div class="bg-k86-black border border-k86-border p-4 rounded-xl text-center peer-checked:border-k86-red peer-checked:bg-k86-red/10 transition-all group-hover:border-k86-red/50">
+                                    <i class="fa-solid fa-store mb-2 block text-xl"></i>
+                                    <span class="text-xs font-bold uppercase">Pickup</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block text-sm font-semibold text-k86-muted uppercase tracking-widest">Payment Method</label>
+                        <div class="flex gap-4">
+                            <label class="flex-1 cursor-pointer group">
+                                <input type="radio" name="payment_method" value="cash" checked class="hidden peer">
+                                <div class="bg-k86-black border border-k86-border p-4 rounded-xl text-center peer-checked:border-k86-red peer-checked:bg-k86-red/10 transition-all group-hover:border-k86-red/50">
+                                    <i class="fa-solid fa-money-bill-1-wave mb-2 block text-xl"></i>
+                                    <span class="text-xs font-bold uppercase">COD</span>
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer group">
+                                <input type="radio" name="payment_method" value="card" class="hidden peer">
+                                <div class="bg-k86-black border border-k86-border p-4 rounded-xl text-center peer-checked:border-k86-red peer-checked:bg-k86-red/10 transition-all group-hover:border-k86-red/50">
+                                    <i class="fa-solid fa-credit-card mb-2 block text-xl"></i>
+                                    <span class="text-xs font-bold uppercase">Card</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-k86-black p-6 rounded-lg border border-k86-surface2 space-y-3 mt-6">
+                    <div class="flex justify-between items-center text-sm font-semibold text-k86-muted uppercase tracking-wider">
+                        <span>Items Subtotal</span>
+                        <span id="chk-subtotal">Rs 0.00</span>
+                    </div>
+                    <div id="delivery-row" class="flex justify-between items-center text-sm font-semibold text-k86-red uppercase tracking-wider">
+                        <span>Delivery Fee</span>
+                        <span id="chk-delivery">Rs 100.00</span>
+                    </div>
+                    <div class="pt-3 border-t border-k86-border flex justify-between items-center">
+                        <span class="text-lg font-heading text-white">Grand Total</span>
+                        <p class="text-4xl font-price text-k86-amber drop-shadow-[0_0_8px_rgba(255,184,0,0.4)]" id="chk-total">Rs 100.00</p>
+                    </div>
                 </div>
                 <button type="submit" class="w-full bg-gradient-to-r from-k86-red to-k86-red-dark hover:from-red-500 hover:to-red-700 py-4 font-bold rounded-lg text-lg transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(255,32,32,0.4)]">CONFIRM ORDER</button>
             </form>
