@@ -96,3 +96,52 @@ INSERT INTO categories (name, display_order, icon) VALUES
 ('Burgers', 3, '🍔'),
 ('Wraps', 4, '🌯'),
 ('Drinks', 5, '🥤');
+
+-- --------------------------------------------------------
+-- 10. Messages Table
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    message TEXT NOT NULL,
+    status ENUM('unread', 'read') DEFAULT 'unread',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- --------------------------------------------------------
+-- 11. Site Settings Table
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS site_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    `key` VARCHAR(100) UNIQUE NOT NULL,
+    `value` TEXT,
+    `group` VARCHAR(50) DEFAULT 'general',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Seed Default Settings
+INSERT IGNORE INTO site_settings (`key`, `value`, `group`) VALUES 
+('site_name', 'Kitchen 86', 'general'),
+('site_tagline', 'The Taste of Tradition', 'general'),
+('about_us', 'Kitchen 86 brings you the most authentic flavors with a modern twist. Our journey began with a passion for quality ingredients and traditional cooking methods.', 'general'),
+('contact_phone', '+92 300 1234567', 'general'),
+('contact_email', 'info@kitchen86.com', 'general'),
+('address', 'Street 86, Food Street, Lahore, Pakistan', 'general'),
+('hero_heading', 'Experience the Fiery Flavors of Kitchen 86', 'hero'),
+('hero_subheading', 'Authentic Matka Fries, Burgers, and More!', 'hero'),
+('hero_bg_image', 'assets/images/hero_bg.jpg', 'hero'),
+('hero_cta_text', 'Order Now', 'hero'),
+('primary_color', '#FF2020', 'brand'),
+('accent_color', '#FFB800', 'brand'),
+('bg_color', '#161616', 'brand'),
+('surface_color', '#1A1A1A', 'brand'),
+('text_color', '#FFFFFF', 'brand'),
+('font_primary', 'Barlow', 'brand'),
+('font_secondary', 'Barlow Condensed', 'brand'),
+('font_display', 'Bebas Neue', 'brand'),
+('footer_description', 'Serving the best flavors since 2024. Quality and taste are our top priorities.', 'footer'),
+('footer_copyright', '© 2024 Kitchen 86. All rights reserved.', 'footer'),
+('social_instagram', 'https://instagram.com/kitchen86', 'footer'),
+('social_facebook', 'https://facebook.com/kitchen86', 'footer'),
+('social_whatsapp', 'https://wa.me/923001234567', 'footer');
