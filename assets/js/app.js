@@ -1,5 +1,5 @@
 const app = {
-    cart: window.CartInterface || {}, auth: window.AuthInterface || {}, checkout: window.CheckoutInterface || {},
+    cart: window.CartInterface || {}, auth: window.AuthInterface || {}, checkout: window.CheckoutInterface || {}, orders: window.OrdersInterface || {},
     init() { this.cache(); this.bind(); this.auth.checkSession().finally(() => this.route()); },
     cache() { this.$main = document.getElementById('app-content'); },
     bind() { window.addEventListener('hashchange', () => this.route()); },
@@ -10,7 +10,7 @@ const app = {
             case '#home': this.render('tpl-home'); break;
             case '#menu': this.render('tpl-menu'); this.loadMenu(); break;
             case '#checkout': if(!this.cart.items.length){window.location.hash='#menu'; return;} this.render('tpl-checkout'); this.checkout.init(); break;
-            case '#orders': this.render('tpl-orders'); break;
+            case '#orders': this.render('tpl-orders'); this.orders.init(); break;
             default: this.render('tpl-home');
         }
     },

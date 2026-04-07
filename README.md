@@ -308,8 +308,8 @@ mysql -u root -p kitchen86 < sql/kitchen86.sql
 
 ### Seeded Admin
 ```
-Email:    admin@gmail.com
-Password: admin@123
+Email:    sasim4589@gmail.com
+Password: Asim@123
 
 ```
 

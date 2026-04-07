@@ -330,8 +330,21 @@
 
     <template id="tpl-orders">
         <div class="reveal">
-            <h2 class="text-4xl font-display mb-8 pb-3 border-b-2 border-k86-red inline-block">MY ORDERS</h2>
-            <div id="orders-list" class="space-y-4"></div>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                <div>
+                    <h2 class="text-5xl font-display pb-3 border-b-2 border-k86-red inline-block text-transparent bg-clip-text bg-gradient-to-r from-k86-amber to-k86-red">MY ORDERS</h2>
+                    <p class="text-k86-muted text-sm font-heading mt-2 uppercase tracking-widest font-bold">Track your cravings in real-time</p>
+                </div>
+                <button onclick="OrdersInterface.loadOrders()" class="bg-k86-surface2 hover:bg-k86-red px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all border border-k86-border flex items-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+            <div id="orders-list" class="space-y-6 pb-20">
+                <!-- Skeletons -->
+                <div class="bg-k86-surface border border-k86-border p-8 rounded-2xl animate-pulse h-24"></div>
+                <div class="bg-k86-surface border border-k86-border p-8 rounded-2xl animate-pulse h-24"></div>
+                <div class="bg-k86-surface border border-k86-border p-8 rounded-2xl animate-pulse h-24"></div>
+            </div>
         </div>
     </template>
 
@@ -415,6 +428,7 @@
     <script src="assets/js/cart.js"></script>
     <script src="assets/js/auth.js?v=2"></script>
     <script src="assets/js/checkout.js"></script>
+    <script src="assets/js/orders.js"></script>
     <script src="assets/js/app.js"></script>
     
     <!-- UI Enhancement Scripts (Vanilla JS) -->
@@ -455,7 +469,7 @@
             }, observerOptions);
 
             // Function to observe dynamically added templates
-            const observeElements = () => {
+            window.observeElements = () => {
                 document.querySelectorAll('.reveal:not(.active)').forEach(el => {
                     observer.observe(el);
                     // Slight delay for DOM to render properly before observing
