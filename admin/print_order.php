@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/db.php';
 require_once '../includes/auth_guard.php'; // Ensure only admin can print
+require_once '../includes/site_settings.php';
 
 $order_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
@@ -191,7 +192,7 @@ try {
 
     <div class="header">
         <div class="logo-box">
-            <h1>KITCHEN 86</h1>
+            <h1><?php echo htmlspecialchars($SETTINGS['site_name'] ?? 'KITCHEN 86'); ?></h1>
             <p>Official Order Invoice</p>
         </div>
         <div class="order-info">
@@ -253,7 +254,7 @@ try {
     </div>
 
     <div class="footer">
-        <p>Thank you for choosing Kitchen 86! We hope you enjoy your meal.</p>
+        <p>Thank you for choosing <?php echo htmlspecialchars($SETTINGS['site_name'] ?? 'Kitchen 86'); ?>! We hope you enjoy your meal.</p>
         <p>This is a computer-generated invoice.</p>
     </div>
 

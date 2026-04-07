@@ -223,6 +223,47 @@ try {
             }
             break;
 
+        case 'settings':
+            if ($method === 'GET') {
+                $stmt = $pdo->query("SELECT * FROM site_settings");
+                $settings = $stmt->fetchAll();
+                $grouped = [];
+                foreach ($settings as $s) {
+                    $grouped[$s['group']][] = $s;
+                }
+                jsonResponse(true, $grouped);
+            } elseif ($method === 'POST') {
+                $pdo->beginTransaction();
+                try {
+                    foreach ($data as $key => $value) {
+                        $stmt = $pdo->prepare("UPDATE site_settings SET value = ? WHERE `key` = ?");
+                        $stmt->execute([$value, $key]);
+                    }
+                    $pdo->commit();
+                    jsonResponse(true, null, 'All settings updated successfully');
+                } catch (Exception $e) {
+                    $pdo->rollBack();
+                    jsonResponse(false, null, 'Failed to update settings: ' . $e->getMessage(), 500);
+                }
+            }
+            break;
+
+        case 'messages':
+            if ($method === 'GET') {
+                $stmt = $pdo->query("SELECT * FROM messages ORDER BY created_at DESC");
+                jsonResponse(true, $stmt->fetchAll());
+            } elseif ($method === 'POST') {
+                // Mark as read
+                $stmt = $pdo->prepare("UPDATE messages SET status = 'read' WHERE id = ?");
+                $stmt->execute([$data['id']]);
+                jsonResponse(true, null, 'Message marked as read');
+            } elseif ($method === 'DELETE') {
+                $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
+                $stmt->execute([$data['id']]);
+                jsonResponse(true, null, 'Message deleted successfully');
+            }
+            break;
+
         default:
             jsonResponse(false, null, 'Resource not found', 404);
     }

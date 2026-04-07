@@ -1,9 +1,12 @@
+<?php 
+require_once __DIR__ . '/includes/site_settings.php'; 
+?>
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kitchen 86 | Cheezious Matka Fries & Fried Chicken</title>
+    <title><?= $SETTINGS['site_name'] ?? 'Kitchen 86' ?> | <?= $SETTINGS['site_tagline'] ?? 'Cheezious Matka Fries & Fried Chicken' ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,19 +15,19 @@
           theme: { 
               extend: { 
                   colors: { 
-                      'k86-red': '#FF2020', 
-                      'k86-red-dark': '#CC1010', 
-                      'k86-amber': '#FFB800', 
-                      'k86-black': '#0A0A0A', 
-                      'k86-surface': '#161616', 
-                      'k86-surface2': '#222222', 
-                      'k86-border': '#2A2A2A', 
+                      'k86-red': '<?= $SETTINGS['primary_color'] ?? '#FF2020' ?>', 
+                      'k86-red-dark': '<?= $SETTINGS['primary_color'] ?? '#FF2020' ?>', 
+                      'k86-amber': '<?= $SETTINGS['accent_color'] ?? '#FFB800' ?>', 
+                      'k86-black': '<?= $SETTINGS['bg_color'] ?? '#0A0A0A' ?>', 
+                      'k86-surface': '<?= $SETTINGS['surface_color'] ?? '#161616' ?>', 
+                      'k86-surface2': '<?= str_replace('16', '22', $SETTINGS['surface_color'] ?? '#161616') ?>', 
+                      'k86-border': '<?= str_replace('16', '2A', $SETTINGS['surface_color'] ?? '#161616') ?>', 
                       'k86-muted': '#AAAAAA'
                   }, 
                   fontFamily: { 
-                      'display': ['Bebas Neue', 'cursive'], 
+                      'display': ['<?= $SETTINGS['font_display'] ?? 'Bebas Neue' ?>', 'cursive'], 
                       'heading': ['Poppins', 'sans-serif'], 
-                      'body': ['Barlow', 'sans-serif'], 
+                      'body': ['<?= $SETTINGS['font_primary'] ?? 'Barlow' ?>', 'sans-serif'], 
                       'price': ['Barlow Condensed', 'sans-serif']
                   },
                   animation: {
@@ -36,6 +39,7 @@
       }
     </script>
     <link rel="stylesheet" href="assets/css/app.css">
+    <?php renderDynamicCSS($SETTINGS); ?>
     <style>
         .drawer-open { transform: translateX(0); }
         .drawer-closed { transform: translateX(100%); }
@@ -43,14 +47,14 @@
         /* Menu Cards Hover Enhancements for JS injected content */
         #menu-grid > div {
             transition: all 0.3s ease-out;
-            border-color: #2A2A2A;
-            background: linear-gradient(145deg, #161616, #111111);
+            border-color: var(--k86-border);
+            background: linear-gradient(145deg, var(--k86-surface), var(--k86-black));
             position: relative;
             overflow: hidden;
         }
         #menu-grid > div:hover {
             transform: translateY(-0.75rem);
-            border-color: #FF2020;
+            border-color: var(--k86-red);
             box-shadow: 0 10px 25px -5px rgba(255, 32, 32, 0.4);
             z-index: 10;
         }
@@ -66,7 +70,7 @@
         #menu-grid > div button:hover {
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(255, 32, 32, 0.6);
-            background-color: #CC1010;
+            opacity: 0.9;
         }
         #menu-grid > div button:active {
             transform: scale(0.95);
@@ -95,15 +99,19 @@
 
         /* Hero Background Overlay */
         .hero-bg {
-            background: radial-gradient(circle at center, rgba(255, 32, 32, 0.15) 0%, rgba(10, 10, 10, 1) 70%);
+            background: radial-gradient(circle at center, rgba(255, 32, 32, 0.15) 0%, var(--k86-black) 70%);
+            background-image: url('<?= $SETTINGS['hero_bg_image'] ?? 'assets/images/hero_bg.jpg' ?>');
+            background-size: cover;
+            background-position: center;
         }
+        .hero-bg > .relative { background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; }
     </style>
 </head>
 <body class="bg-k86-black text-white font-body antialiased min-h-screen flex flex-col">
     <!-- Navbar -->
     <nav id="main-nav" class="sticky top-0 z-40 bg-k86-surface/80 backdrop-blur-md border-b border-k86-border px-4 py-3 transition-colors duration-300">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <a href="#home" class="text-k86-red font-display text-4xl tracking-wider hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(255,32,32,0.5)]">KITCHEN 86</a>
+            <a href="#home" class="text-k86-red font-display text-4xl tracking-wider hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(255,32,32,0.5)] uppercase"><?= $SETTINGS['site_name'] ?? 'KITCHEN 86' ?></a>
             
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center gap-6 text-sm font-semibold tracking-wide">
@@ -154,17 +162,17 @@
     <!-- Templates -->
     <template id="tpl-home">
         <!-- Hero Section -->
-        <div class="relative py-24 md:py-32 flex flex-col items-center justify-center text-center hero-bg rounded-3xl overflow-hidden shadow-2xl border border-k86-surface2 mb-16 reveal">
-            <!-- decorative background shapes -->
-            <div class="absolute top-10 left-10 w-32 h-32 bg-k86-red rounded-full opacity-10 blur-3xl animate-pulse-fast"></div>
-            <div class="absolute bottom-10 right-10 w-48 h-48 bg-k86-amber rounded-full opacity-10 blur-3xl animate-pulse-fast" style="animation-delay: 1s;"></div>
-            
-            <div class="relative z-10">
-                <span class="inline-block bg-k86-red/20 text-k86-red border border-k86-red px-3 py-1 rounded-full text-sm font-bold tracking-widest mb-6 animate-bounce-slow shadow-[0_0_10px_rgba(255,32,32,0.5)]"><i class="fa-solid fa-fire text-k86-red mr-1"></i> HOT & SPICY</span>
-                <h1 class="text-7xl md:text-8xl font-display text-transparent bg-clip-text bg-gradient-to-r from-k86-amber via-yellow-300 to-k86-red mb-6 drop-shadow-lg transform transition-transform duration-700 hover:scale-105">BOLD. HOT. FAST.</h1>
-                <p class="text-k86-muted text-lg md:text-xl font-heading max-w-2xl mx-auto mb-10">Experience the ultimate Cheezious Matka Fries & legendary Fried Chicken in Larkana.</p>
+        <div class="relative min-h-[500px] flex flex-col items-center justify-center text-center hero-bg rounded-3xl overflow-hidden shadow-2xl border border-k86-surface2 mb-16 reveal">
+            <div class="relative z-10 flex flex-col items-center justify-center">
+                <!-- decorative background shapes -->
+                <div class="absolute top-0 left-0 w-32 h-32 bg-k86-red rounded-full opacity-10 blur-3xl animate-pulse-fast"></div>
+                <div class="absolute bottom-0 right-0 w-48 h-48 bg-k86-amber rounded-full opacity-10 blur-3xl animate-pulse-fast" style="animation-delay: 1s;"></div>
+                
+                <span class="inline-block bg-k86-red/20 text-k86-red border border-k86-red px-3 py-1 rounded-full text-sm font-bold tracking-widest mb-6 animate-bounce-slow shadow-[0_0_10px_rgba(255,32,32,0.5)] uppercase"><i class="fa-solid fa-fire text-k86-red mr-1"></i> HOT & SPICY</span>
+                <h1 class="text-6xl md:text-8xl font-display text-transparent bg-clip-text bg-gradient-to-r from-k86-amber via-yellow-300 to-k86-red mb-6 drop-shadow-lg transform transition-transform duration-700 hover:scale-105 uppercase tracking-tighter leading-none"><?= $SETTINGS['hero_heading'] ?? 'BOLD. HOT. FAST.' ?></h1>
+                <p class="text-k86-muted text-lg md:text-xl font-heading max-w-2xl mx-auto mb-10"><?= $SETTINGS['hero_subheading'] ?? 'Experience the ultimate Cheezious Matka Fries & legendary Fried Chicken in Larkana.' ?></p>
                 <a href="javascript:void(0)" onclick="scrollToMenu()" class="inline-block bg-k86-red px-10 py-4 text-white font-bold rounded-lg text-lg transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95 group">
-                    ORDER NOW
+                    <?= $SETTINGS['hero_cta_text'] ?? 'ORDER NOW' ?>
                     <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
                 </a>
             </div>
@@ -191,8 +199,7 @@
                         <span class="w-8 h-0.5 bg-k86-red inline-block"></span> Our Story
                     </span>
                     <h2 class="text-5xl md:text-6xl font-display text-white drop-shadow-md">Born in the Heart of Larkana</h2>
-                    <p class="text-k86-muted text-lg leading-relaxed font-body">Kitchen 86 started with a simple belief: fast food shouldn't be boring. We brought the authentic, mouth-watering experience of Cheezious Matka Fries and perfectly spiced Fried Chicken straight to your neighborhood. Every bite is a testament to our passion for bold flavors, fresh ingredients, and serious heat.</p>
-                    <p class="text-k86-muted text-lg leading-relaxed font-body">Whether you're grabbing a quick bite or feasting with friends, you're not just eating—you're experiencing the legendary K86 energy.</p>
+                    <p class="text-k86-muted text-lg leading-relaxed font-body"><?= nl2br(htmlspecialchars($SETTINGS['about_us'] ?? 'Kitchen 86 started with a simple belief: fast food shouldn\'t be boring. We brought the authentic, mouth-watering experience of Cheezious Matka Fries and perfectly spiced Fried Chicken straight to your neighborhood.')) ?></p>
                 </div>
                 <div class="relative group">
                     <div class="absolute -inset-2 bg-gradient-to-r from-k86-red to-k86-amber rounded-2xl opacity-20 group-hover:opacity-40 blur-xl transition duration-500"></div>
@@ -203,7 +210,7 @@
 
         <!-- Menu Section Inline -->
         <div id="menu-section" class="py-12 reveal">
-            <h2 class="text-5xl font-display mb-8 pb-3 border-b-2 border-k86-red inline-block text-transparent bg-clip-text bg-gradient-to-r from-k86-amber to-k86-red">OUR MENU</h2>
+            <h2 class="text-5xl font-display mb-8 pb-3 border-b-2 border-k86-red inline-block text-transparent bg-clip-text bg-gradient-to-r from-k86-amber to-k86-red uppercase">OUR MENU</h2>
             <div id="category-filters" class="flex flex-wrap gap-4 pb-8"></div>
             <!-- The grid will be populated by app.js, and CSS transitions added to head handle the hover animations -->
             <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
@@ -213,7 +220,7 @@
         <div id="contact-section" class="py-16 reveal my-12">
             <div class="text-center mb-12 flex flex-col items-center">
                 <span class="text-k86-red font-bold tracking-widest text-sm uppercase flex items-center gap-2 mb-2">Reach Out</span>
-                <h2 class="text-5xl font-display pb-3 border-b-2 border-k86-red inline-block text-transparent bg-clip-text bg-gradient-to-r from-k86-amber to-k86-red">GET IN TOUCH</h2>
+                <h2 class="text-5xl font-display pb-3 border-b-2 border-k86-red inline-block text-transparent bg-clip-text bg-gradient-to-r from-k86-amber to-k86-red uppercase">GET IN TOUCH</h2>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gradient-to-br from-k86-surface to-[rgba(10,10,10,0.8)] border border-k86-surface2 rounded-3xl p-6 lg:p-10 shadow-[0_0_40px_rgba(0,0,0,0.6)] relative overflow-hidden">
@@ -222,26 +229,29 @@
                 <div class="space-y-6 relative z-10 mr-0 md:mr-4">
                     <h3 class="text-3xl font-heading font-bold text-white mb-2">Drop us a line</h3>
                     <p class="text-k86-muted mb-8">Have a question, feedback, or a large event order? We'd love to hear from you.</p>
-                    <form class="space-y-5" onsubmit="event.preventDefault(); if(window.Toast) window.Toast.show('Message sent successfully!', 'success'); this.reset();">
+                    <form id="public-contact-form" class="space-y-5" onsubmit="app.handleContact(event)">
                         <div>
-                            <input type="text" required placeholder="Your Name" class="w-full bg-k86-black rounded-xl px-5 py-4 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all shadow-inner">
+                            <input type="text" name="name" required placeholder="Your Name" class="w-full bg-k86-black rounded-xl px-5 py-4 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all shadow-inner">
                         </div>
                         <div>
-                            <input type="email" required placeholder="Email Address" class="w-full bg-k86-black rounded-xl px-5 py-4 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all shadow-inner">
+                            <input type="email" name="email" required placeholder="Email Address" class="w-full bg-k86-black rounded-xl px-5 py-4 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all shadow-inner">
                         </div>
                         <div>
-                            <textarea required placeholder="Your Message" rows="4" class="w-full bg-k86-black rounded-xl px-5 py-4 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all shadow-inner resize-none"></textarea>
+                            <textarea name="message" required placeholder="Your Message" rows="4" class="w-full bg-k86-black rounded-xl px-5 py-4 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all shadow-inner resize-none"></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-gradient-to-r from-k86-red to-k86-red-dark hover:from-red-500 hover:to-red-700 py-4 rounded-xl font-bold tracking-widest transition-all active:scale-95 shadow-[0_5px_15px_rgba(255,32,32,0.3)]">SEND MESSAGE</button>
+                        <button type="submit" id="btn-send-message" class="w-full bg-gradient-to-r from-k86-red to-k86-red-dark hover:from-red-500 hover:to-red-700 py-4 rounded-xl font-bold tracking-widest transition-all active:scale-95 shadow-[0_5px_15px_rgba(255,32,32,0.3)] flex items-center justify-center gap-2">
+                            <span>SEND MESSAGE</span>
+                            <div class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" id="contact-spinner"></div>
+                        </button>
                     </form>
                 </div>
                 <!-- Google Maps Embed -->
                 <div class="flex flex-col h-full min-h-[350px] relative rounded-2xl overflow-hidden border border-k86-surface2 group mt-8 md:mt-0 shadow-lg">
                     <div class="absolute inset-0 bg-gradient-to-b from-k86-red/20 to-k86-black/60 group-hover:opacity-0 transition-opacity duration-700 z-10 pointer-events-none mix-blend-color"></div>
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d113645.92209142858!2d68.14081041935661!3d27.545802213768292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x393504fb4d2eb7b7%3A0xe5a36aa27ed7ebf!2sLarkana%2C%20Sindh%2C%20Pakistan!5e0!3m2!1sen!2s!4v1711200000000!5m2!1sen!2s" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="absolute inset-0 grayscale contrast-125 opacity-70 group-hover:grayscale-[0.5] group-hover:opacity-100 transition-all duration-700"></iframe>
+                    <iframe src="<?= $SETTINGS['map_embed_link'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d113645.92209142858!2d68.14081041935661!3d27.545802213768292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x393504fb4d2eb7b7%3A0xe5a36aa27ed7ebf!2sLarkana%2C%20Sindh%2C%20Pakistan!5e0!3m2!1sen!2s!4v1711200000000!5m2!1sen!2s' ?>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="absolute inset-0 grayscale contrast-125 opacity-70 group-hover:grayscale-[0.5] group-hover:opacity-100 transition-all duration-700"></iframe>
                     <div class="absolute bottom-4 left-4 right-4 bg-k86-surface/90 backdrop-blur-md border border-k86-border p-4 rounded-xl z-20 shadow-xl transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                        <p class="font-heading font-bold text-white mb-1"><svg class="w-4 h-4 inline-block mr-1 text-k86-red mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Kitchen 86 HQ</p>
-                        <p class="text-xs text-k86-muted ml-5">VIP Road, Larkana, Sindh, PK</p>
+                        <p class="font-heading font-bold text-white mb-1 uppercase tracking-wider"><svg class="w-4 h-4 inline-block mr-1 text-k86-red mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> <?= $SETTINGS['site_name'] ?? 'Kitchen 86' ?> HQ</p>
+                        <p class="text-xs text-k86-muted ml-5"><?= $SETTINGS['address'] ?? 'VIP Road, Larkana, Sindh, PK' ?></p>
                     </div>
                 </div>
             </div>
@@ -251,58 +261,58 @@
     <template id="tpl-checkout">
         <div class="max-w-2xl mx-auto bg-k86-surface p-8 rounded-2xl border border-k86-border shadow-[0_0_30px_rgba(0,0,0,0.5)] reveal relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-k86-red via-k86-amber to-k86-red"></div>
-            <h2 class="text-4xl font-display mb-8 pb-4 border-b border-k86-border text-center">SECURE CHECKOUT</h2>
+            <h2 class="text-4xl font-display mb-8 pb-4 border-b border-k86-border text-center uppercase tracking-widest">SECURE CHECKOUT</h2>
             <form id="checkout-form" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-semibold text-k86-muted mb-2">Full Name</label>
+                    <label class="block text-sm font-semibold text-k86-muted mb-2 uppercase tracking-widest text-[10px]">Full Name</label>
                     <input type="text" id="chk-name" required placeholder="John Doe" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-surface2 focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all duration-300">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-k86-muted mb-2">Phone Number</label>
+                    <label class="block text-sm font-semibold text-k86-muted mb-2 uppercase tracking-widest text-[10px]">Phone Number</label>
                     <input type="tel" id="chk-phone" required placeholder="03xx-xxxxxxx" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-surface2 focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all duration-300">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-k86-muted mb-2">Delivery Address</label>
+                    <label class="block text-sm font-semibold text-k86-muted mb-2 uppercase tracking-widest text-[10px]">Delivery Address</label>
                     <textarea id="chk-address" required placeholder="Street, Sector, City..." rows="3" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-surface2 focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all duration-300"></textarea>
                 </div>
 
                 <!-- Order Type & Payment Method -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-3">
-                        <label class="block text-sm font-semibold text-k86-muted uppercase tracking-widest">Order Type</label>
+                        <label class="block text-sm font-semibold text-k86-muted uppercase tracking-widest text-[10px]">Order Type</label>
                         <div class="flex gap-4">
                             <label class="flex-1 cursor-pointer group">
                                 <input type="radio" name="order_type" value="delivery" checked class="hidden peer">
                                 <div class="bg-k86-black border border-k86-border p-4 rounded-xl text-center peer-checked:border-k86-red peer-checked:bg-k86-red/10 transition-all group-hover:border-k86-red/50">
-                                    <i class="fa-solid fa-truck-fast mb-2 block text-xl"></i>
-                                    <span class="text-xs font-bold uppercase">Delivery</span>
+                                    <i class="fa-solid fa-truck-fast mb-2 block text-xl text-k86-muted peer-checked:text-k86-red"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Delivery</span>
                                 </div>
                             </label>
                             <label class="flex-1 cursor-pointer group">
                                 <input type="radio" name="order_type" value="pickup" class="hidden peer">
                                 <div class="bg-k86-black border border-k86-border p-4 rounded-xl text-center peer-checked:border-k86-red peer-checked:bg-k86-red/10 transition-all group-hover:border-k86-red/50">
-                                    <i class="fa-solid fa-store mb-2 block text-xl"></i>
-                                    <span class="text-xs font-bold uppercase">Pickup</span>
+                                    <i class="fa-solid fa-store mb-2 block text-xl text-k86-muted peer-checked:text-k86-red"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Pickup</span>
                                 </div>
                             </label>
                         </div>
                     </div>
 
                     <div class="space-y-3">
-                        <label class="block text-sm font-semibold text-k86-muted uppercase tracking-widest">Payment Method</label>
+                        <label class="block text-sm font-semibold text-k86-muted uppercase tracking-widest text-[10px]">Payment Method</label>
                         <div class="flex gap-4">
                             <label class="flex-1 cursor-pointer group">
                                 <input type="radio" name="payment_method" value="cash" checked class="hidden peer">
                                 <div class="bg-k86-black border border-k86-border p-4 rounded-xl text-center peer-checked:border-k86-red peer-checked:bg-k86-red/10 transition-all group-hover:border-k86-red/50">
-                                    <i class="fa-solid fa-money-bill-1-wave mb-2 block text-xl"></i>
-                                    <span class="text-xs font-bold uppercase">COD</span>
+                                    <i class="fa-solid fa-money-bill-1-wave mb-2 block text-xl text-k86-muted peer-checked:text-k86-red"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wider">COD</span>
                                 </div>
                             </label>
                             <label class="flex-1 cursor-pointer group">
                                 <input type="radio" name="payment_method" value="card" class="hidden peer">
                                 <div class="bg-k86-black border border-k86-border p-4 rounded-xl text-center peer-checked:border-k86-red peer-checked:bg-k86-red/10 transition-all group-hover:border-k86-red/50">
-                                    <i class="fa-solid fa-credit-card mb-2 block text-xl"></i>
-                                    <span class="text-xs font-bold uppercase">Card</span>
+                                    <i class="fa-solid fa-credit-card mb-2 block text-xl text-k86-muted peer-checked:text-k86-red"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Card</span>
                                 </div>
                             </label>
                         </div>
@@ -319,11 +329,11 @@
                         <span id="chk-delivery">Rs 100.00</span>
                     </div>
                     <div class="pt-3 border-t border-k86-border flex justify-between items-center">
-                        <span class="text-lg font-heading text-white">Grand Total</span>
+                        <span class="text-lg font-heading text-white uppercase tracking-widest">Grand Total</span>
                         <p class="text-4xl font-price text-k86-amber drop-shadow-[0_0_8px_rgba(255,184,0,0.4)]" id="chk-total">Rs 100.00</p>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-k86-red to-k86-red-dark hover:from-red-500 hover:to-red-700 py-4 font-bold rounded-lg text-lg transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(255,32,32,0.4)]">CONFIRM ORDER</button>
+                <button type="submit" class="w-full bg-gradient-to-r from-k86-red to-k86-red-dark hover:from-red-500 hover:to-red-700 py-4 font-bold rounded-lg text-lg transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(255,32,32,0.4)] uppercase tracking-widest">CONFIRM ORDER</button>
             </form>
         </div>
     </template>
@@ -332,7 +342,7 @@
         <div class="reveal">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                 <div>
-                    <h2 class="text-5xl font-display pb-3 border-b-2 border-k86-red inline-block text-transparent bg-clip-text bg-gradient-to-r from-k86-amber to-k86-red">MY ORDERS</h2>
+                    <h2 class="text-5xl font-display pb-3 border-b-2 border-k86-red inline-block text-transparent bg-clip-text bg-gradient-to-r from-k86-amber to-k86-red uppercase tracking-tighter">MY ORDERS</h2>
                     <p class="text-k86-muted text-sm font-heading mt-2 uppercase tracking-widest font-bold">Track your cravings in real-time</p>
                 </div>
                 <button onclick="OrdersInterface.loadOrders()" class="bg-k86-surface2 hover:bg-k86-red px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all border border-k86-border flex items-center gap-2">
@@ -351,7 +361,7 @@
     <!-- Cart Drawer -->
     <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full md:w-96 bg-k86-surface border-l border-k86-border z-50 drawer-closed flex flex-col transition-transform duration-500 shadow-[-10px_0_30px_rgba(0,0,0,0.8)]">
         <div class="p-6 border-b border-k86-border flex justify-between items-center bg-gradient-to-b from-k86-surface2 to-k86-surface">
-            <h3 class="font-display text-3xl text-k86-amber tracking-wide flex items-center gap-2">
+            <h3 class="font-display text-3xl text-k86-amber tracking-wide flex items-center gap-2 uppercase">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
                 CART
             </h3>
@@ -362,10 +372,10 @@
         <div id="cart-items" class="flex-grow p-4 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-k86-surface2"></div>
         <div class="p-6 border-t border-k86-border bg-gradient-to-t from-k86-surface2 to-k86-surface">
             <div class="flex justify-between items-end mb-6">
-                <span class="font-heading text-k86-muted uppercase tracking-wider text-sm">Subtotal</span>
+                <span class="font-heading text-k86-muted uppercase tracking-wider text-xs">Subtotal</span>
                 <span id="cart-total" class="font-price text-3xl text-k86-amber font-bold">Rs 0.00</span>
             </div>
-            <a href="#checkout" onclick="app.cart.toggleDrawer()" class="block w-full bg-k86-red text-center font-bold px-4 py-4 rounded-lg transform transition-all duration-300 hover:bg-red-500 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95" id="btn-checkout">PROCEED TO CHECKOUT</a>
+            <a href="#checkout" onclick="app.cart.toggleDrawer()" class="block w-full bg-k86-red text-center font-bold px-4 py-4 rounded-lg transform transition-all duration-300 hover:bg-red-500 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95 uppercase tracking-widest text-sm" id="btn-checkout">PROCEED TO CHECKOUT</a>
         </div>
     </div>
     
@@ -378,7 +388,7 @@
             </button>
             
             <div id="form-login-view" class="relative z-10">
-                <h3 class="text-4xl font-display text-k86-amber mb-6 text-center tracking-wide">WELCOME BACK</h3>
+                <h3 class="text-4xl font-display text-k86-amber mb-6 text-center tracking-tighter uppercase">WELCOME BACK</h3>
                 <form id="form-login" class="space-y-5">
                     <div>
                         <input type="email" id="login-email" required placeholder="Email Address" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all">
@@ -389,15 +399,15 @@
                             <i class="fa-solid fa-eye border border-k86-border px-2 py-1.5 rounded"></i>
                         </button>
                     </div>
-                    <button type="submit" class="w-full bg-k86-red py-3 rounded-lg font-bold tracking-wider hover:bg-red-500 transition-colors shadow-lg shadow-k86-red/20 active:scale-95">LOGIN</button>
-                    <p class="text-center text-k86-muted mt-4">
+                    <button type="submit" class="w-full bg-k86-red py-3 rounded-lg font-bold tracking-widest hover:bg-red-500 transition-colors shadow-lg shadow-k86-red/20 active:scale-95 uppercase">LOGIN</button>
+                    <p class="text-center text-k86-muted mt-4 text-xs uppercase tracking-widest">
                         New here? <a href="javascript:void(0)" onclick="app.auth.switchView('register')" class="text-k86-amber hover:text-yellow-400 underline transition-colors">Join the family</a>
                     </p>
                 </form>
             </div>
             
             <div id="form-register-view" class="hidden relative z-10">
-                <h3 class="text-4xl font-display text-k86-amber mb-6 text-center tracking-wide">JOIN KITCHEN 86</h3>
+                <h3 class="text-4xl font-display text-k86-amber mb-6 text-center tracking-tighter uppercase">JOIN THE CREW</h3>
                 <form id="form-register" class="space-y-5">
                     <div>
                         <input type="text" id="reg-name" required placeholder="Full Name" class="w-full bg-k86-black rounded-lg px-4 py-3 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all">
@@ -414,8 +424,8 @@
                             <i class="fa-solid fa-eye border border-k86-border px-2 py-1.5 rounded"></i>
                         </button>
                     </div>
-                    <button type="submit" class="w-full bg-k86-red py-3 rounded-lg font-bold tracking-wider hover:bg-red-500 transition-colors shadow-lg shadow-k86-red/20 active:scale-95">CREATE ACCOUNT</button>
-                    <p class="text-center text-k86-muted mt-4">
+                    <button type="submit" class="w-full bg-k86-red py-3 rounded-lg font-bold tracking-widest hover:bg-red-500 transition-colors shadow-lg shadow-k86-red/20 active:scale-95 uppercase">CREATE ACCOUNT</button>
+                    <p class="text-center text-k86-muted mt-4 text-xs uppercase tracking-widest">
                         Already have an account? <a href="javascript:void(0)" onclick="app.auth.switchView('login')" class="text-k86-amber hover:text-yellow-400 underline transition-colors">Login</a>
                     </p>
                 </form>
@@ -451,6 +461,45 @@
         
         // Backward compatibility
         window.scrollToMenu = () => window.scrollToSection('menu-section');
+
+        // Contact Form Submission
+        app.handleContact = function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('btn-send-message');
+            const spinner = document.getElementById('contact-spinner');
+            
+            const formData = {
+                name: form.name.value,
+                email: form.email.value,
+                message: form.message.value
+            };
+
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+
+            fetch('api/contact.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    if(window.Toast) window.Toast.show(res.message, 'success');
+                    form.reset();
+                } else {
+                    if(window.Toast) window.Toast.show(res.message, 'error');
+                }
+            })
+            .catch(err => {
+                if(window.Toast) window.Toast.show('Something went wrong. Try again.', 'error');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+            });
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             // Setup Intersection Observer for scroll animations
@@ -577,55 +626,66 @@
         <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10">
             <!-- Brand -->
             <div class="col-span-1 md:col-span-1">
-                <a href="#home" onclick="window.scrollTo({top:0, behavior:'smooth'})" class="text-k86-red font-display text-4xl tracking-wider inline-block mb-4 hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(255,32,32,0.3)]">KITCHEN 86</a>
-                <p class="text-k86-muted text-sm mb-6 font-heading">The boldest flavor in Larkana. Serving up Cheezious Matka Fries & Legendary Fried Chicken directly to your door.</p>
+                <a href="#home" onclick="window.scrollTo({top:0, behavior:'smooth'})" class="text-k86-red font-display text-4xl tracking-wider inline-block mb-4 hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(255,32,32,0.3)] uppercase tracking-tighter"><?= $SETTINGS['site_name'] ?? 'KITCHEN 86' ?></a>
+                <p class="text-k86-muted text-xs mb-6 font-heading uppercase tracking-widest leading-loose"><?= $SETTINGS['footer_description'] ?? 'SERVERS OF FINE FOOD & BOLD FLAVORS IN THE HEART OF LARKANA.' ?></p>
                 <div class="flex gap-4">
-                    <a href="javascript:void(0)" class="w-10 h-10 rounded-full bg-k86-surface2 border border-k86-border flex items-center justify-center text-white hover:border-k86-red hover:text-k86-red hover:shadow-[0_0_10px_rgba(255,32,32,0.4)] transition-all transform hover:-translate-y-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></a>
-                    <a href="javascript:void(0)" class="w-10 h-10 rounded-full bg-k86-surface2 border border-k86-border flex items-center justify-center text-white hover:border-k86-red hover:text-k86-red hover:shadow-[0_0_10px_rgba(255,32,32,0.4)] transition-all transform hover:-translate-y-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                    <?php if(!empty($SETTINGS['social_instagram'])): ?>
+                    <a href="<?= $SETTINGS['social_instagram'] ?>" target="_blank" class="w-10 h-10 rounded-full bg-k86-surface2 border border-k86-border flex items-center justify-center text-white hover:border-k86-red hover:text-k86-red hover:shadow-[0_0_10px_rgba(255,32,32,0.4)] transition-all transform hover:-translate-y-1"><i class="fab fa-instagram"></i></a>
+                    <?php endif; ?>
+                    <?php if(!empty($SETTINGS['social_facebook'])): ?>
+                    <a href="<?= $SETTINGS['social_facebook'] ?>" target="_blank" class="w-10 h-10 rounded-full bg-k86-surface2 border border-k86-border flex items-center justify-center text-white hover:border-k86-red hover:text-k86-red hover:shadow-[0_0_10px_rgba(255,32,32,0.4)] transition-all transform hover:-translate-y-1"><i class="fab fa-facebook-f"></i></a>
+                    <?php endif; ?>
+                    <?php if(!empty($SETTINGS['social_whatsapp'])): ?>
+                    <a href="<?= $SETTINGS['social_whatsapp'] ?>" target="_blank" class="w-10 h-10 rounded-full bg-k86-surface2 border border-k86-border flex items-center justify-center text-white hover:border-k86-red hover:text-k86-red hover:shadow-[0_0_10px_rgba(255,32,32,0.4)] transition-all transform hover:-translate-y-1"><i class="fab fa-whatsapp"></i></a>
+                    <?php endif; ?>
                 </div>
             </div>
             
             <!-- Quick Links -->
-            <div>
-                <h4 class="font-heading font-bold text-white mb-6 uppercase tracking-wider text-sm border-b border-k86-surface2 pb-2 inline-block">Explore</h4>
-                <ul class="space-y-3 text-k86-muted text-sm">
-                    <li><a href="javascript:void(0)" onclick="scrollToSection('menu-section')" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">Our Menu</a></li>
-                    <li><a href="javascript:void(0)" onclick="scrollToSection('about-section')" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">Our Story</a></li>
-                    <li><a href="javascript:void(0)" onclick="scrollToSection('contact-section')" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">Contact/Location</a></li>
-                    <li><a href="javascript:void(0)" onclick="app.auth.openLogin()" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">My Account</a></li>
+            <div class="pl-0 md:pl-8">
+                <h4 class="font-heading font-bold text-white mb-6 uppercase tracking-widest text-xs border-b border-k86-red pb-2 inline-block">EXPLORE</h4>
+                <ul class="space-y-3 text-k86-muted text-[10px] uppercase tracking-[0.2em] font-bold">
+                    <li><a href="javascript:void(0)" onclick="scrollToSection('menu-section')" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">OUR MENU</a></li>
+                    <li><a href="javascript:void(0)" onclick="scrollToSection('about-section')" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">OUR STORY</a></li>
+                    <li><a href="javascript:void(0)" onclick="scrollToSection('contact-section')" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">CONTACT</a></li>
+                    <li><a href="javascript:void(0)" onclick="app.auth.openLogin()" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">MY ACCOUNT</a></li>
                 </ul>
             </div>
             
             <!-- Contact -->
             <div>
-                <h4 class="font-heading font-bold text-white mb-6 uppercase tracking-wider text-sm border-b border-k86-surface2 pb-2 inline-block">Contact Us</h4>
-                <ul class="space-y-4 text-k86-muted text-sm">
+                <h4 class="font-heading font-bold text-white mb-6 uppercase tracking-widest text-xs border-b border-k86-red pb-2 inline-block">CONTACT US</h4>
+                <ul class="space-y-4 text-k86-muted text-[10px] uppercase tracking-widest font-bold">
                     <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-k86-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span>VIP Road, Larkana<br>Sindh, Pakistan</span>
+                        <svg class="w-4 h-4 text-k86-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span class="leading-relaxed"><?= $SETTINGS['address'] ?? 'VIP ROAD, LARKANA<br>SINDH, PAKISTAN' ?></span>
                     </li>
                     <li class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-k86-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                        <span>+92 300 1234567</span>
+                        <svg class="w-4 h-4 text-k86-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        <span><?= $SETTINGS['contact_phone'] ?? '+92 300 1234567' ?></span>
+                    </li>
+                    <li class="flex items-center gap-3 lowercase transform -translate-x-1">
+                        <svg class="w-4 h-4 text-k86-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <span class="tracking-widest uppercase text-[9px]"><?= $SETTINGS['contact_email'] ?? 'INFO@KITCHEN86.COM' ?></span>
                     </li>
                 </ul>
             </div>
             
             <!-- Opening Hours -->
             <div>
-                <h4 class="font-heading font-bold text-white mb-6 uppercase tracking-wider text-sm border-b border-k86-surface2 pb-2 inline-block">Opening Hours</h4>
-                <ul class="space-y-3 text-sm text-k86-muted flex flex-col">
-                    <li class="flex justify-between border-b border-k86-surface2 pb-2"><span>Mon - Thu</span> <span class="text-white">12:00 PM - 1:00 AM</span></li>
-                    <li class="flex justify-between border-b border-k86-surface2 pb-2"><span>Fri - Sun</span> <span class="text-white font-bold">12:00 PM - 3:00 AM</span></li>
+                <h4 class="font-heading font-bold text-white mb-6 uppercase tracking-widest text-xs border-b border-k86-red pb-2 inline-block">OPENING HOURS</h4>
+                <ul class="space-y-3 text-[10px] text-k86-muted uppercase tracking-widest font-bold">
+                    <li class="flex justify-between border-b border-k86-surface2 pb-2"><span>MON - THU</span> <span class="text-white">12:00 PM - 1:00 AM</span></li>
+                    <li class="flex justify-between border-b border-k86-surface2 pb-2"><span>FRI - SUN</span> <span class="text-white">12:00 PM - 3:00 AM</span></li>
                 </ul>
             </div>
         </div>
         
-        <div class="max-w-6xl mx-auto px-4 mt-12 pt-8 border-t border-k86-surface2 text-center text-xs text-k86-muted/60 relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p>&copy; 2026 Kitchen 86. All rights reserved.</p>
-            <div class="flex gap-4">
-                <a href="javascript:void(0)" class="hover:text-white transition-colors">Privacy Policy</a>
-                <a href="javascript:void(0)" class="hover:text-white transition-colors">Terms of Service</a>
+        <div class="max-w-6xl mx-auto px-4 mt-12 pt-8 border-t border-k86-surface2 text-center text-[10px] text-k86-muted uppercase tracking-[0.3em] font-bold relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p><?= $SETTINGS['footer_copyright'] ?? '© 2024 KITCHEN 86. ALL RIGHTS RESERVED.' ?></p>
+            <div class="flex gap-6">
+                <a href="javascript:void(0)" class="hover:text-white transition-colors">PRIVACY POLICY</a>
+                <a href="javascript:void(0)" class="hover:text-white transition-colors">TERMS OF SERVICE</a>
             </div>
         </div>
     </footer>

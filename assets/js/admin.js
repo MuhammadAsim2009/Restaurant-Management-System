@@ -140,6 +140,8 @@ window.adminApp = {
                         document.getElementById('tbl-deals').innerHTML = j.data.map(item => this.dealRowTemplate(item)).join('');
                     }
                 }
+            } else if (page === 'settings') {
+                this.fetchSettings();
             }
         } catch(e) { console.error('API Error', e); }
     },
@@ -1836,6 +1838,120 @@ window.adminApp = {
                 this.fetchData('users');
             }
         } catch(e) { console.error('Delete user error', e); }
+    },
+
+    async fetchSettings() {
+        const loader = document.getElementById('settings-loader');
+        if(loader) loader.classList.remove('hidden');
+        
+        try {
+            let r = await fetch('../api/admin.php?resource=settings');
+            let j = await r.json();
+            if(j.success && j.data) {
+                this.settingsCache = j.data;
+                this.populateSettingsForm(j.data);
+            }
+        } catch(e) { console.error('Fetch settings error', e); }
+        
+        if(loader) loader.classList.add('hidden');
+    },
+
+    populateSettingsForm(data) {
+        const form = document.getElementById('form-site-settings');
+        if(!form) return;
+
+        // Flatten grouped data for easier form filling
+        Object.values(data).flat().forEach(s => {
+            const input = form.querySelector(`[name="${s.key}"]`);
+            if(input) {
+                input.value = s.value;
+                // Special handling for color previews
+                if(input.type === 'color') {
+                    this.previewColor(s.key, s.value);
+                }
+                // Special handling for hero preview
+                if(['hero_heading', 'hero_subheading', 'hero_cta_text', 'hero_bg_image'].includes(s.key)) {
+                    this.updateHeroPreview(s.key, s.value);
+                }
+            }
+        });
+    },
+
+    switchSettingsTab(tab) {
+        // Update Buttons
+        document.querySelectorAll('.settings-tab').forEach(btn => {
+            if(btn.getAttribute('data-tab') === tab) {
+                btn.classList.add('active', 'bg-k86-surface', 'border-k86-red');
+                btn.classList.remove('bg-k86-surface2', 'border-transparent', 'text-k86-muted');
+            } else {
+                btn.classList.remove('active', 'bg-k86-surface', 'border-k86-red');
+                btn.classList.add('bg-k86-surface2', 'border-transparent', 'text-k86-muted');
+            }
+        });
+
+        // Update Sections
+        document.querySelectorAll('.settings-section').forEach(sec => {
+            if(sec.id === `section-${tab}`) {
+                sec.classList.remove('hidden');
+                sec.classList.add('animate-fade-in');
+            } else {
+                sec.classList.add('hidden');
+            }
+        });
+    },
+
+    previewColor(key, val) {
+        const label = document.getElementById(`label-${key}`);
+        if(label) label.textContent = val.toUpperCase();
+        
+        // Dynamic preview for hero section if colors affect it (optional)
+        if(key === 'primary_color') {
+            const heroCta = document.getElementById('hero-preview-cta');
+            if(heroCta) heroCta.style.backgroundColor = val;
+        }
+    },
+
+    updateHeroPreview(key, val) {
+        if(key === 'hero_heading') document.getElementById('hero-preview-heading').textContent = val;
+        if(key === 'hero_subheading') document.getElementById('hero-preview-sub').textContent = val;
+        if(key === 'hero_cta_text') document.getElementById('hero-preview-cta').textContent = val;
+        if(key === 'hero_bg_image') document.getElementById('hero-preview-bg').style.backgroundImage = `url('${this.resolveImg(val)}')`;
+    },
+
+    async saveSettings(e) {
+        e.preventDefault();
+        const form = document.getElementById('form-site-settings');
+        if(!form) return;
+
+        const loader = document.getElementById('settings-loader');
+        if(loader) {
+            loader.classList.remove('hidden');
+            loader.querySelector('p').textContent = 'Saving Changes...';
+        }
+
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+
+        try {
+            let r = await fetch('../api/admin.php?resource=settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            let j = await r.json();
+            if(j.success) {
+                if(window.Toast) Toast.show('All changes saved successfully!', 'success');
+                // Refresh cache
+                this.fetchSettings();
+            } else {
+                if(window.Toast) Toast.show(j.message || 'Error saving settings', 'error');
+            }
+        } catch(err) {
+            console.error('Save settings error', err);
+            if(window.Toast) Toast.show('Connection error', 'error');
+        }
+
+        if(loader) loader.classList.add('hidden');
     },
 
     logout() { fetch('../api/auth.php?action=logout').then(() => window.location.href = '../'); }

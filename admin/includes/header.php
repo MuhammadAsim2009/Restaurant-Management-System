@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../includes/session.php';
 require_once __DIR__ . '/../../includes/auth_guard.php';
+require_once __DIR__ . '/../../includes/site_settings.php';
 
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
@@ -9,7 +10,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | Kitchen 86</title>
+    <title>Admin Panel | <?= $SETTINGS['site_name'] ?? 'Kitchen 86' ?></title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,13 +30,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
             theme: {
                 extend: {
                     colors: {
-                        'k86-red': '#FF2020',
-                        'k86-red-dark': '#CC1010',
-                        'k86-amber': '#FFB800',
-                        'k86-black': '#0A0A0A',
-                        'k86-surface': '#161616',
-                        'k86-surface2': '#222222',
-                        'k86-border': '#2A2A2A',
+                        'k86-red': '<?= $SETTINGS['primary_color'] ?? '#FF2020' ?>',
+                        'k86-red-dark': '<?= $SETTINGS['primary_color'] ?? '#CC1010' ?>',
+                        'k86-amber': '<?= $SETTINGS['accent_color'] ?? '#FFB800' ?>',
+                        'k86-black': '<?= $SETTINGS['bg_color'] ?? '#0A0A0A' ?>',
+                        'k86-surface': '<?= $SETTINGS['surface_color'] ?? '#161616' ?>',
+                        'k86-surface2': '<?= str_replace('16', '22', $SETTINGS['surface_color'] ?? '#161616') ?>',
+                        'k86-border': '<?= str_replace('16', '2A', $SETTINGS['surface_color'] ?? '#161616') ?>',
                         'k86-muted': '#AAAAAA',
                         'k86-success': '#22C55E',
                         'k86-warning': '#F97316',
@@ -70,16 +71,49 @@ $current_page = basename($_SERVER['PHP_SELF']);
     
     <link rel="stylesheet" href="../assets/css/app.css">
     <style>
+        :root {
+            --k86-red: <?= $SETTINGS['primary_color'] ?? '#FF2020' ?>;
+            --k86-amber: <?= $SETTINGS['accent_color'] ?? '#FFB800' ?>;
+            --k86-black: <?= $SETTINGS['bg_color'] ?? '#0A0A0A' ?>;
+            --k86-surface: <?= $SETTINGS['surface_color'] ?? '#161616' ?>;
+        }
+
         /* Custom scrollbar for dark theme */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0A0A0A; }
         ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #FF2020; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--k86-red); }
         
+        .nav-link {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         .nav-link.active {
-            background-color: #FF2020;
+            background-color: var(--k86-red);
             color: white;
-            box-shadow: 0 0 15px rgba(255, 32, 32, 0.4);
+            box-shadow: 0 10px 20px -5px rgba(255, 32, 32, 0.4);
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        
+        .nav-link:not(.active):hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .nav-link svg {
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .nav-link.active svg {
+            color: white;
+        }
+
+        .nav-link:hover svg {
+            transform: scale(1.1);
+            color: var(--k86-red);
         }
     </style>
 </head>
@@ -112,16 +146,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-k86-red rounded-full ring-2 ring-k86-surface"></span>
                 </button>
                 
-                <div class="w-px h-6 bg-k86-border"></div>
-
                 <!-- Profile -->
                 <div class="flex items-center gap-3 cursor-pointer group">
                     <div class="w-9 h-9 rounded-full bg-k86-surface2 border border-k86-border flex items-center justify-center overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=FF2020&color=fff" alt="Admin" class="w-full h-full object-cover">
+                        <?php 
+                        $admin_name = $_SESSION['user_name'] ?? 'Admin User';
+                        $avatar_url = "https://ui-avatars.com/api/?name=" . urlencode($admin_name) . "&background=" . str_replace('#', '', $SETTINGS['primary_color'] ?? 'FF2020') . "&color=fff";
+                        ?>
+                        <img src="<?= $avatar_url ?>" alt="Admin" class="w-full h-full object-cover">
                     </div>
-                    <div class="hidden md:block text-sm">
-                        <p class="font-semibold text-white leading-tight">Admin User</p>
-                        <p class="text-k86-muted text-xs">Superadmin</p>
+                    <div class="hidden md:block text-sm text-left">
+                        <p class="font-semibold text-white leading-tight"><?= htmlspecialchars($admin_name) ?></p>
+                        <p class="text-k86-muted text-[10px] font-bold uppercase tracking-widest"><?= $_SESSION['user_role'] ?? 'Superadmin' ?></p>
                     </div>
                 </div>
             </div>
