@@ -9,6 +9,7 @@ require_once __DIR__ . '/includes/site_settings.php';
     <title><?= $SETTINGS['site_name'] ?? 'Kitchen 86' ?> | <?= $SETTINGS['site_tagline'] ?? 'Cheezious Matka Fries & Fried Chicken' ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="assets/js/theme.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = { 
@@ -18,13 +19,19 @@ require_once __DIR__ . '/includes/site_settings.php';
                       'k86-red': '<?= $SETTINGS['primary_color'] ?? '#FF2020' ?>', 
                       'k86-red-dark': '<?= $SETTINGS['primary_color'] ?? '#FF2020' ?>', 
                       'k86-amber': '<?= $SETTINGS['accent_color'] ?? '#FFB800' ?>', 
-                      'k86-black': '<?= $SETTINGS['bg_color'] ?? '#0A0A0A' ?>', 
-                      'k86-surface': '<?= $SETTINGS['surface_color'] ?? '#161616' ?>', 
-                      'k86-surface2': '<?= str_replace('16', '22', $SETTINGS['surface_color'] ?? '#161616') ?>', 
-                      'k86-border': '<?= str_replace('16', '2A', $SETTINGS['surface_color'] ?? '#161616') ?>', 
-                      'k86-muted': '#AAAAAA'
+                      'k86-black': 'var(--k86-bg)', 
+                      'k86-surface': 'var(--k86-surface)', 
+                      'k86-surface2': 'var(--k86-surface2)', 
+                      'k86-border': 'var(--k86-border)', 
+                      'k86-muted': 'var(--k86-text-muted)'
                   }, 
-                  fontFamily: { 
+                  textColor: {
+                      'white': 'var(--k86-text)',
+                      'pure-white': '#FFFFFF',
+                      'k86-muted': 'var(--k86-text-muted)',
+                      'k86-red': '<?= $SETTINGS['primary_color'] ?? '#FF2020' ?>',
+                      'k86-amber': '<?= $SETTINGS['accent_color'] ?? '#FFB800' ?>'
+                  },                  fontFamily: { 
                       'display': ['<?= $SETTINGS['font_display'] ?? 'Bebas Neue' ?>', 'cursive'], 
                       'heading': ['Poppins', 'sans-serif'], 
                       'body': ['<?= $SETTINGS['font_primary'] ?? 'Barlow' ?>', 'sans-serif'], 
@@ -41,6 +48,23 @@ require_once __DIR__ . '/includes/site_settings.php';
     <link rel="stylesheet" href="assets/css/app.css">
     <?php renderDynamicCSS($SETTINGS); ?>
     <style>
+        :root {
+            /* Derived variables / non-core settings */
+            --k86-surface2: <?= str_replace('16', '22', $SETTINGS['surface_color'] ?? '#161616') ?>;
+            --k86-border: <?= str_replace('16', '2A', $SETTINGS['surface_color'] ?? '#161616') ?>;
+            --hero-overlay: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%);
+            --hero-glow: rgba(255, 32, 32, 0.15);
+            --card-shadow: rgba(255, 32, 32, 0.4);
+        }
+
+        .light-mode {
+            --k86-surface2: <?= $SETTINGS['light_bg_color'] ?? '#F1F5F9' ?>;
+            --k86-border: rgba(0,0,0,0.08);
+            --hero-overlay: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.4) 100%);
+            --hero-glow: rgba(255, 32, 32, 0.05);
+            --card-shadow: rgba(0, 0, 0, 0.1);
+        }
+
         .drawer-open { transform: translateX(0); }
         .drawer-closed { transform: translateX(100%); }
         
@@ -55,7 +79,7 @@ require_once __DIR__ . '/includes/site_settings.php';
         #menu-grid > div:hover {
             transform: translateY(-0.75rem);
             border-color: var(--k86-red);
-            box-shadow: 0 10px 25px -5px rgba(255, 32, 32, 0.4);
+            box-shadow: 0 10px 25px -5px var(--card-shadow);
             z-index: 10;
         }
         #menu-grid > div img {
@@ -99,15 +123,20 @@ require_once __DIR__ . '/includes/site_settings.php';
 
         /* Hero Background Overlay */
         .hero-bg {
-            background: radial-gradient(circle at center, rgba(255, 32, 32, 0.15) 0%, var(--k86-black) 70%);
-            background-image: url('<?= $SETTINGS['hero_bg_image'] ?? 'assets/images/hero_bg.jpg' ?>');
+            background-color: var(--k86-black);
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('assets/images/hero_bg.jpg');
             background-size: cover;
             background-position: center;
         }
-        .hero-bg > .relative { background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; }
+        .hero-bg > .relative { background: var(--hero-overlay); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; }
+
+        /* Theme Toggle Icon Swap */
+        .light-mode .theme-toggle-btn i::before {
+            content: "\f186"; /* Moon icon */
+        }
     </style>
 </head>
-<body class="bg-k86-black text-white font-body antialiased min-h-screen flex flex-col">
+<body class="bg-k86-black text-white font-body antialiased min-h-screen flex flex-col transition-all duration-500">
     <!-- Navbar -->
     <nav id="main-nav" class="sticky top-0 z-40 bg-k86-surface/80 backdrop-blur-md border-b border-k86-border px-4 py-3 transition-colors duration-300">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
@@ -115,6 +144,10 @@ require_once __DIR__ . '/includes/site_settings.php';
             
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center gap-6 text-sm font-semibold tracking-wide">
+                <a href="#home" class="relative group hover:text-k86-red transition-colors duration-300">
+                    HOME
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-k86-red transition-all duration-300 group-hover:w-full"></span>
+                </a>
                 <a href="javascript:void(0)" onclick="scrollToSection('menu-section')" class="relative group hover:text-k86-red transition-colors duration-300">
                     MENU
                     <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-k86-red transition-all duration-300 group-hover:w-full"></span>
@@ -131,9 +164,15 @@ require_once __DIR__ . '/includes/site_settings.php';
                     MY ORDERS
                     <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-k86-red transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a href="javascript:void(0)" onclick="app.auth.openLogin()" id="nav-login" class="hover:text-k86-red transition-colors duration-300">LOGIN</a>
-                <a href="javascript:void(0)" onclick="app.auth.logout()" id="nav-logout" class="hover:text-k86-red transition-colors duration-300 hidden">LOGOUT</a>
-                <button onclick="app.cart.toggleDrawer()" class="relative bg-k86-surface2 hover:bg-k86-red px-4 py-2 rounded transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,32,32,0.5)] active:scale-95">
+                <a href="javascript:void(0)" onclick="K86.auth.openLogin()" id="nav-login" class="hover:text-k86-red transition-colors duration-300">LOGIN</a>
+                <a href="javascript:void(0)" onclick="K86.auth.logout()" id="nav-logout" class="hover:text-k86-red transition-colors duration-300 hidden">LOGOUT</a>
+                
+                <!-- Theme Toggle -->
+                <button onclick="window.toggleK86Theme()" class="theme-toggle-btn text-k86-muted hover:text-k86-red transition-colors duration-300 p-2 rounded-full hover:bg-k86-surface2" title="Toggle Theme">
+                    <i class="fa-solid fa-sun"></i>
+                </button>
+
+                <button onclick="K86.cart.toggleDrawer()" class="relative bg-k86-surface2 hover:bg-k86-red px-4 py-2 rounded transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,32,32,0.5)] active:scale-95">
                     CART 
                     <span class="absolute -top-2 -right-2 bg-k86-amber text-k86-black text-xs font-bold px-2 rounded-full shadow-lg" id="cart-badge">0</span>
                 </button>
@@ -147,13 +186,20 @@ require_once __DIR__ . '/includes/site_settings.php';
         
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden mt-4 pb-2 flex flex-col gap-4 text-center text-lg font-heading">
+            <a href="#home" class="hover:text-k86-red transition-colors" onclick="this.parentElement.classList.add('hidden')">HOME</a>
             <a href="javascript:void(0)" class="hover:text-k86-red transition-colors" onclick="scrollToSection('menu-section'); this.parentElement.classList.add('hidden')">MENU</a>
             <a href="javascript:void(0)" class="hover:text-k86-red transition-colors" onclick="scrollToSection('about-section'); this.parentElement.classList.add('hidden')">ABOUT</a>
             <a href="javascript:void(0)" class="hover:text-k86-red transition-colors" onclick="scrollToSection('contact-section'); this.parentElement.classList.add('hidden')">CONTACT</a>
             <a href="#orders" id="nav-orders-mob" class="hover:text-k86-red hidden" onclick="this.parentElement.classList.add('hidden')">MY ORDERS</a>
-            <a href="javascript:void(0)" onclick="app.auth.openLogin(); this.parentElement.classList.add('hidden')" id="nav-login-mob" class="hover:text-k86-red">LOGIN</a>
-            <a href="javascript:void(0)" onclick="app.auth.logout(); this.parentElement.classList.add('hidden')" id="nav-logout-mob" class="hover:text-k86-red hidden">LOGOUT</a>
-            <button onclick="app.cart.toggleDrawer(); this.parentElement.classList.add('hidden')" class="bg-k86-red px-4 py-2 rounded mx-4 text-white font-bold">CART (<span id="cart-badge-mob">0</span>)</button>
+            <a href="javascript:void(0)" onclick="K86.auth.openLogin(); this.parentElement.classList.add('hidden')" id="nav-login-mob" class="hover:text-k86-red">LOGIN</a>
+            <a href="javascript:void(0)" onclick="K86.auth.logout(); this.parentElement.classList.add('hidden')" id="nav-logout-mob" class="hover:text-k86-red hidden">LOGOUT</a>
+            <div class="flex items-center justify-center gap-4 py-2 border-y border-k86-border">
+                <span class="text-xs uppercase tracking-widest font-bold">Theme</span>
+                <button onclick="window.toggleK86Theme()" class="theme-toggle-btn text-k86-muted hover:text-k86-red transition-colors duration-300 p-2 rounded-full hover:bg-k86-surface2" title="Toggle Theme">
+                    <i class="fa-solid fa-sun"></i>
+                </button>
+            </div>
+            <button onclick="K86.cart.toggleDrawer(); this.parentElement.classList.add('hidden')" class="bg-k86-red px-4 py-2 rounded mx-4 text-white font-bold">CART (<span id="cart-badge-mob">0</span>)</button>
         </div>
     </nav>
     
@@ -171,7 +217,7 @@ require_once __DIR__ . '/includes/site_settings.php';
                 <span class="inline-block bg-k86-red/20 text-k86-red border border-k86-red px-3 py-1 rounded-full text-sm font-bold tracking-widest mb-6 animate-bounce-slow shadow-[0_0_10px_rgba(255,32,32,0.5)] uppercase"><i class="fa-solid fa-fire text-k86-red mr-1"></i> HOT & SPICY</span>
                 <h1 class="text-6xl md:text-8xl font-display text-transparent bg-clip-text bg-gradient-to-r from-k86-amber via-yellow-300 to-k86-red mb-6 drop-shadow-lg transform transition-transform duration-700 hover:scale-105 uppercase tracking-tighter leading-none"><?= $SETTINGS['hero_heading'] ?? 'BOLD. HOT. FAST.' ?></h1>
                 <p class="text-k86-muted text-lg md:text-xl font-heading max-w-2xl mx-auto mb-10"><?= $SETTINGS['hero_subheading'] ?? 'Experience the ultimate Cheezious Matka Fries & legendary Fried Chicken in Larkana.' ?></p>
-                <a href="javascript:void(0)" onclick="scrollToMenu()" class="inline-block bg-k86-red px-10 py-4 text-white font-bold rounded-lg text-lg transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95 group">
+                <a href="javascript:void(0)" onclick="scrollToMenu()" class="inline-block bg-k86-red px-10 py-4 text-pure-white font-bold rounded-lg text-lg transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95 group">
                     <?= $SETTINGS['hero_cta_text'] ?? 'ORDER NOW' ?>
                     <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
                 </a>
@@ -192,7 +238,7 @@ require_once __DIR__ . '/includes/site_settings.php';
         </div>
 
         <!-- About Us Section -->
-        <div id="about-section" class="py-16 reveal relative overflow-hidden rounded-3xl bg-k86-surface/50 border border-k86-surface2 my-12 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+        <div id="about-section" class="py-16 reveal relative overflow-hidden rounded-3xl bg-k86-surface border border-k86-surface2 my-12 shadow-xl">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center p-8 md:p-12">
                 <div class="space-y-6">
                     <span class="text-k86-red font-bold tracking-widest text-sm uppercase flex items-center gap-2">
@@ -223,13 +269,13 @@ require_once __DIR__ . '/includes/site_settings.php';
                 <h2 class="text-5xl font-display pb-3 border-b-2 border-k86-red inline-block text-transparent bg-clip-text bg-gradient-to-r from-k86-amber to-k86-red uppercase">GET IN TOUCH</h2>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gradient-to-br from-k86-surface to-[rgba(10,10,10,0.8)] border border-k86-surface2 rounded-3xl p-6 lg:p-10 shadow-[0_0_40px_rgba(0,0,0,0.6)] relative overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-k86-surface border border-k86-border rounded-3xl p-6 lg:p-10 shadow-xl relative overflow-hidden">
                 <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-k86-amber rounded-full opacity-5 blur-[100px] pointer-events-none"></div>
                 <!-- Contact Form -->
                 <div class="space-y-6 relative z-10 mr-0 md:mr-4">
-                    <h3 class="text-3xl font-heading font-bold text-white mb-2">Drop us a line</h3>
+                    <h3 class="text-3xl font-heading font-bold text-current mb-2">Drop us a line</h3>
                     <p class="text-k86-muted mb-8">Have a question, feedback, or a large event order? We'd love to hear from you.</p>
-                    <form id="public-contact-form" class="space-y-5" onsubmit="app.handleContact(event)">
+                    <form id="public-contact-form" class="space-y-5" onsubmit="K86.handleContact(event)">
                         <div>
                             <input type="text" name="name" required placeholder="Your Name" class="w-full bg-k86-black rounded-xl px-5 py-4 border border-k86-border focus:border-k86-red focus:ring-1 focus:ring-k86-red outline-none transition-all shadow-inner">
                         </div>
@@ -251,7 +297,6 @@ require_once __DIR__ . '/includes/site_settings.php';
                     <iframe src="<?= $SETTINGS['map_embed_link'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d113645.92209142858!2d68.14081041935661!3d27.545802213768292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x393504fb4d2eb7b7%3A0xe5a36aa27ed7ebf!2sLarkana%2C%20Sindh%2C%20Pakistan!5e0!3m2!1sen!2s!4v1711200000000!5m2!1sen!2s' ?>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="absolute inset-0 grayscale contrast-125 opacity-70 group-hover:grayscale-[0.5] group-hover:opacity-100 transition-all duration-700"></iframe>
                     <div class="absolute bottom-4 left-4 right-4 bg-k86-surface/90 backdrop-blur-md border border-k86-border p-4 rounded-xl z-20 shadow-xl transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                         <p class="font-heading font-bold text-white mb-1 uppercase tracking-wider"><svg class="w-4 h-4 inline-block mr-1 text-k86-red mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> <?= $SETTINGS['site_name'] ?? 'Kitchen 86' ?> HQ</p>
-                        <p class="text-xs text-k86-muted ml-5"><?= $SETTINGS['address'] ?? 'VIP Road, Larkana, Sindh, PK' ?></p>
                     </div>
                 </div>
             </div>
@@ -277,7 +322,7 @@ require_once __DIR__ . '/includes/site_settings.php';
                 </div>
 
                 <!-- Order Type & Payment Method -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-6">
                     <div class="space-y-3">
                         <label class="block text-sm font-semibold text-k86-muted uppercase tracking-widest text-[10px]">Order Type</label>
                         <div class="flex gap-4">
@@ -365,7 +410,7 @@ require_once __DIR__ . '/includes/site_settings.php';
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
                 CART
             </h3>
-            <button onclick="app.cart.toggleDrawer()" class="text-k86-muted hover:text-white transition-colors p-2 rounded-full hover:bg-k86-surface2">
+            <button onclick="K86.cart.toggleDrawer()" class="text-k86-muted hover:text-white transition-colors p-2 rounded-full hover:bg-k86-surface2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -375,7 +420,7 @@ require_once __DIR__ . '/includes/site_settings.php';
                 <span class="font-heading text-k86-muted uppercase tracking-wider text-xs">Subtotal</span>
                 <span id="cart-total" class="font-price text-3xl text-k86-amber font-bold">Rs 0.00</span>
             </div>
-            <a href="#checkout" onclick="app.cart.toggleDrawer()" class="block w-full bg-k86-red text-center font-bold px-4 py-4 rounded-lg transform transition-all duration-300 hover:bg-red-500 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95 uppercase tracking-widest text-sm" id="btn-checkout">PROCEED TO CHECKOUT</a>
+            <a href="#checkout" onclick="K86.cart.toggleDrawer()" class="block w-full bg-k86-red text-center font-bold px-4 py-4 rounded-lg transform transition-all duration-300 hover:bg-red-500 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95 uppercase tracking-widest text-sm" id="btn-checkout">PROCEED TO CHECKOUT</a>
         </div>
     </div>
     
@@ -383,7 +428,7 @@ require_once __DIR__ . '/includes/site_settings.php';
     <div id="auth-modal" class="fixed inset-0 z-[60] hidden bg-black/90 backdrop-blur-[2px] flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
         <div class="bg-k86-surface p-8 rounded-2xl w-full max-w-md relative border border-k86-border shadow-[0_0_40px_rgba(0,0,0,0.8)] transform scale-95 transition-all duration-300" id="auth-modal-content">
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-k86-red rounded-full opacity-20 blur-2xl"></div>
-            <button onclick="app.auth.closeModal()" class="absolute top-4 right-4 text-k86-muted hover:text-white transition-colors bg-k86-black p-2 rounded-full hover:bg-k86-surface2">
+            <button onclick="K86.auth.closeModal()" class="absolute top-4 right-4 text-k86-muted hover:text-white transition-colors bg-k86-black p-2 rounded-full hover:bg-k86-surface2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             
@@ -401,7 +446,7 @@ require_once __DIR__ . '/includes/site_settings.php';
                     </div>
                     <button type="submit" class="w-full bg-k86-red py-3 rounded-lg font-bold tracking-widest hover:bg-red-500 transition-colors shadow-lg shadow-k86-red/20 active:scale-95 uppercase">LOGIN</button>
                     <p class="text-center text-k86-muted mt-4 text-xs uppercase tracking-widest">
-                        New here? <a href="javascript:void(0)" onclick="app.auth.switchView('register')" class="text-k86-amber hover:text-yellow-400 underline transition-colors">Join the family</a>
+                        New here? <a href="javascript:void(0)" onclick="K86.auth.switchView('register')" class="text-k86-amber hover:text-yellow-400 underline transition-colors">Join the family</a>
                     </p>
                 </form>
             </div>
@@ -426,7 +471,7 @@ require_once __DIR__ . '/includes/site_settings.php';
                     </div>
                     <button type="submit" class="w-full bg-k86-red py-3 rounded-lg font-bold tracking-widest hover:bg-red-500 transition-colors shadow-lg shadow-k86-red/20 active:scale-95 uppercase">CREATE ACCOUNT</button>
                     <p class="text-center text-k86-muted mt-4 text-xs uppercase tracking-widest">
-                        Already have an account? <a href="javascript:void(0)" onclick="app.auth.switchView('login')" class="text-k86-amber hover:text-yellow-400 underline transition-colors">Login</a>
+                        Already have an account? <a href="javascript:void(0)" onclick="K86.auth.switchView('login')" class="text-k86-amber hover:text-yellow-400 underline transition-colors">Login</a>
                     </p>
                 </form>
             </div>
@@ -463,7 +508,7 @@ require_once __DIR__ . '/includes/site_settings.php';
         window.scrollToMenu = () => window.scrollToSection('menu-section');
 
         // Contact Form Submission
-        app.handleContact = function(e) {
+        K86.handleContact = function(e) {
             e.preventDefault();
             const form = e.target;
             const btn = document.getElementById('btn-send-message');
@@ -562,11 +607,11 @@ require_once __DIR__ . '/includes/site_settings.php';
             });
 
             // Enhanced Modal Show/Hide
-            const originalOpenModal = app.auth.openLogin;
-            const originalCloseModal = app.auth.closeModal;
+            const originalOpenModal = K86.auth.openLogin;
+            const originalCloseModal = K86.auth.closeModal;
             
-            app.auth.openLogin = function() {
-                if(originalOpenModal) originalOpenModal.call(app.auth);
+            K86.auth.openLogin = function() {
+                if(originalOpenModal) originalOpenModal.call(K86.auth);
                 const modal = document.getElementById('auth-modal');
                 const content = document.getElementById('auth-modal-content');
                 if(modal) {
@@ -580,7 +625,7 @@ require_once __DIR__ . '/includes/site_settings.php';
                 }
             };
             
-            app.auth.closeModal = function() {
+            K86.auth.closeModal = function() {
                 const modal = document.getElementById('auth-modal');
                 const content = document.getElementById('auth-modal-content');
                 if(modal) {
@@ -590,14 +635,14 @@ require_once __DIR__ . '/includes/site_settings.php';
                     content.classList.add('scale-95');
                     setTimeout(() => {
                         modal.classList.add('hidden');
-                        if(originalCloseModal) originalCloseModal.call(app.auth);
+                        if(originalCloseModal) originalCloseModal.call(K86.auth);
                     }, 300);
                 }
             };
 
-            // Override app.render to load menu into home automatically
-            const originalRender = app.render;
-            app.render = function(tId) {
+            // Override K86.render to load menu into home automatically
+            const originalRender = K86.render;
+            K86.render = function(tId) {
                 // If they route to #menu, redirect to #home 
                 if (tId === 'tpl-menu') {
                     window.location.replace(window.location.pathname + window.location.search + '#home');
@@ -648,7 +693,7 @@ require_once __DIR__ . '/includes/site_settings.php';
                     <li><a href="javascript:void(0)" onclick="scrollToSection('menu-section')" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">OUR MENU</a></li>
                     <li><a href="javascript:void(0)" onclick="scrollToSection('about-section')" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">OUR STORY</a></li>
                     <li><a href="javascript:void(0)" onclick="scrollToSection('contact-section')" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">CONTACT</a></li>
-                    <li><a href="javascript:void(0)" onclick="app.auth.openLogin()" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">MY ACCOUNT</a></li>
+                    <li><a href="javascript:void(0)" onclick="K86.auth.openLogin()" class="hover:text-k86-red transition-colors inline-block hover:translate-x-1 transform duration-300">MY ACCOUNT</a></li>
                 </ul>
             </div>
             

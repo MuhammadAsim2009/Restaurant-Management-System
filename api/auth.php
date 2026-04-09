@@ -136,7 +136,7 @@ function handleLogin($pdo, $data) {
 
     try {
         // 2. Fetch the user info by email
-        $stmt = $pdo->prepare("SELECT id, name, email, password_hash, role FROM users WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, name, email, password_hash, role, phone FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -154,6 +154,7 @@ function handleLogin($pdo, $data) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];
+        $_SESSION['user_phone'] = $user['phone'] ?? '';
         $_SESSION['role'] = $user['role']; // For isAdmin() check in auth_guard
 
         // 5. Return user details (Never pass back the hash!)
@@ -162,6 +163,7 @@ function handleLogin($pdo, $data) {
             'name' => $user['name'],
             'email' => $user['email'],
             'role' => $user['role'],
+            'phone' => $user['phone'] ?? '',
             'cart_data' => getCartItems($pdo, $user['id'])
         ]);
 
@@ -181,6 +183,7 @@ function handleMe() {
             'id' => $_SESSION['user_id'],
             'name' => $_SESSION['user_name'],
             'role' => $_SESSION['user_role'],
+            'phone' => $_SESSION['user_phone'] ?? '',
             'cart_data' => getCartItems($pdo, $_SESSION['user_id'])
         ]);
     } else {

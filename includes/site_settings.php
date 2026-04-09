@@ -25,6 +25,13 @@ $surface_color = $SETTINGS['surface_color'] ?? '#1A1A1A';
 $font_display = $SETTINGS['font_display'] ?? 'Bebas Neue';
 $font_primary = $SETTINGS['font_primary'] ?? 'Barlow';
 
+// Light Mode Defaults
+$SETTINGS['light_bg_color'] = $SETTINGS['light_bg_color'] ?? '#F8FAFC';
+$SETTINGS['light_surface_color'] = $SETTINGS['light_surface_color'] ?? '#FFFFFF';
+$SETTINGS['light_primary_color'] = $SETTINGS['light_primary_color'] ?? $primary_color;
+$SETTINGS['light_accent_color'] = $SETTINGS['light_accent_color'] ?? $accent_color;
+$SETTINGS['light_text_color'] = $SETTINGS['light_text_color'] ?? '#0F172A';
+
 /**
  * Output dynamic CSS based on site settings
  */
@@ -36,33 +43,52 @@ function renderDynamicCSS($SETTINGS) {
     $font_display = $SETTINGS['font_display'] ?? 'Bebas Neue';
     $font_primary = $SETTINGS['font_primary'] ?? 'Barlow';
     
+    // Light mode values from settings or defaults
+    $l_bg = $SETTINGS['light_bg_color'] ?? '#F8FAFC';
+    $l_surface = $SETTINGS['light_surface_color'] ?? '#FFFFFF';
+    $l_primary = $SETTINGS['light_primary_color'] ?? $primary;
+    $l_accent = $SETTINGS['light_accent_color'] ?? $accent;
+    $l_text = $SETTINGS['light_text_color'] ?? '#0F172A';
+
     echo "
     <style>
         :root {
             --k86-red: $primary;
             --k86-amber: $accent;
-            --k86-black: $bg;
+            --k86-bg: $bg;
             --k86-surface: $surface;
+            --k86-text: #FFFFFF;
+            --k86-text-muted: #AAAAAA;
+        }
+
+        .light-mode {
+            --k86-bg: $l_bg;
+            --k86-surface: $l_surface;
+            --k86-red: $l_primary;
+            --k86-amber: $l_accent;
+            --k86-text: $l_text;
+            --k86-text-muted: #64748B;
         }
         
-        /* Font overrides if dynamic fonts are selected */
+        /* Font overrides */
         .font-display { font-family: '$font_display', cursive !important; }
         body, .font-body { font-family: '$font_primary', sans-serif !important; }
         
-        /* Tailwind custom class overrides */
-        .text-k86-red { color: $primary !important; }
-        .bg-k86-red { background-color: $primary !important; }
-        .border-k86-red { border-color: $primary !important; }
+        /* Utility overrides using variables */
+        .text-k86-red { color: var(--k86-red) !important; }
+        .bg-k86-red { background-color: var(--k86-red) !important; }
+        .border-k86-red { border-color: var(--k86-red) !important; }
         
-        .text-k86-amber { color: $accent !important; }
-        .bg-k86-amber { background-color: $accent !important; }
+        .text-k86-amber { color: var(--k86-amber) !important; }
+        .bg-k86-amber { background-color: var(--k86-amber) !important; }
         
-        .bg-k86-black { background-color: $bg !important; }
-        .bg-k86-surface { background-color: $surface !important; }
+        .bg-k86-black { background-color: var(--k86-bg) !important; }
+        .bg-k86-surface { background-color: var(--k86-surface) !important; }
+        .text-white { color: var(--k86-text) !important; }
+        .text-k86-muted { color: var(--k86-text-muted) !important; }
         
         /* Dynamic Shadow and Glow effects */
-        .shadow-k86-red\/20 { shadow: 0 10px 15px -3px rgba(" . hexToRgb($primary) . ", 0.2); }
-        .drop-shadow-\[0_0_8px_rgba\(255\,32\,32\,0\.5\)\] { filter: drop-shadow(0 0 8px rgba(" . hexToRgb($primary) . ", 0.5)); }
+        .shadow-k86-red\/20 { box-shadow: 0 10px 15px -3px rgba(" . hexToRgb($primary) . ", 0.2); }
     </style>
     ";
 }

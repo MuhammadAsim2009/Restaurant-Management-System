@@ -77,8 +77,8 @@ kitchen86/
 3.  **Config**: Update `includes/db.php` with your local database credentials if they differ from defaults (root/no password).
 
 ### Default Admin Credentials
-- **Email**: `admin@gmail.com`
-- **Password**: `admin@123`
+- **Email**: ``sasim4589@gmail.com`
+- **Password**: `Asim@123`
 
 ---
 

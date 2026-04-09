@@ -235,9 +235,29 @@ try {
             } elseif ($method === 'POST') {
                 $pdo->beginTransaction();
                 try {
+                    // Handle Hero Background Image Upload
+                    if (isset($_FILES['hero_bg_image_file']) && $_FILES['hero_bg_image_file']['error'] === UPLOAD_ERR_OK) {
+                        $fileTmpPath = $_FILES['hero_bg_image_file']['tmp_name'];
+                        $fileName = $_FILES['hero_bg_image_file']['name'];
+                        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                        $newFileName = 'hero_' . uniqid() . '.' . $fileExtension;
+                        $uploadDir = __DIR__ . '/../assets/images/hero/';
+                        
+                        if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+                        
+                        $destPath = $uploadDir . $newFileName;
+                        if (move_uploaded_file($fileTmpPath, $destPath)) {
+                            // Update the key in $data so it gets saved to DB
+                            $data['hero_bg_image'] = 'assets/images/hero/' . $newFileName;
+                        }
+                    }
+
                     foreach ($data as $key => $value) {
-                        $stmt = $pdo->prepare("UPDATE site_settings SET value = ? WHERE `key` = ?");
-                        $stmt->execute([$value, $key]);
+                        // Skip the file input if it exists in POST (usually it doesn't, but just in case)
+                        if ($key === 'hero_bg_image_file') continue;
+                        
+                        $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`, `group`) VALUES (?, ?, 'brand') ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
+                        $stmt->execute([$key, $value]);
                     }
                     $pdo->commit();
                     jsonResponse(true, null, 'All settings updated successfully');

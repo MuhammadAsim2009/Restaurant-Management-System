@@ -22,6 +22,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <script src="../assets/js/theme.js"></script>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,14 +34,21 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         'k86-red': '<?= $SETTINGS['primary_color'] ?? '#FF2020' ?>',
                         'k86-red-dark': '<?= $SETTINGS['primary_color'] ?? '#CC1010' ?>',
                         'k86-amber': '<?= $SETTINGS['accent_color'] ?? '#FFB800' ?>',
-                        'k86-black': '<?= $SETTINGS['bg_color'] ?? '#0A0A0A' ?>',
-                        'k86-surface': '<?= $SETTINGS['surface_color'] ?? '#161616' ?>',
-                        'k86-surface2': '<?= str_replace('16', '22', $SETTINGS['surface_color'] ?? '#161616') ?>',
-                        'k86-border': '<?= str_replace('16', '2A', $SETTINGS['surface_color'] ?? '#161616') ?>',
-                        'k86-muted': '#AAAAAA',
+                        'k86-black': 'var(--k86-bg)',
+                        'k86-surface': 'var(--k86-surface)',
+                        'k86-surface2': 'var(--k86-surface2)',
+                        'k86-border': 'var(--k86-border)',
+                        'k86-muted': 'var(--k86-text-muted)',
                         'k86-success': '#22C55E',
                         'k86-warning': '#F97316',
                         'k86-danger': '#EF4444'
+                    },
+                    textColor: {
+                        'white': 'var(--k86-text)',
+                        'pure-white': '#FFFFFF',
+                        'k86-muted': 'var(--k86-text-muted)',
+                        'k86-red': '<?= $SETTINGS['primary_color'] ?? '#FF2020' ?>',
+                        'k86-amber': '<?= $SETTINGS['accent_color'] ?? '#FFB800' ?>'
                     },
                     fontFamily: {
                         'display': ['Bebas Neue', 'cursive'],
@@ -72,48 +80,83 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="../assets/css/app.css">
     <style>
         :root {
+            --k86-bg: <?= $SETTINGS['bg_color'] ?? '#0A0A0A' ?>;
+            --k86-surface: <?= $SETTINGS['surface_color'] ?? '#161616' ?>;
+            --k86-surface2: <?= str_replace('16', '22', $SETTINGS['surface_color'] ?? '#161616') ?>;
+            --k86-border: <?= str_replace('16', '2A', $SETTINGS['surface_color'] ?? '#161616') ?>;
             --k86-red: <?= $SETTINGS['primary_color'] ?? '#FF2020' ?>;
             --k86-amber: <?= $SETTINGS['accent_color'] ?? '#FFB800' ?>;
-            --k86-black: <?= $SETTINGS['bg_color'] ?? '#0A0A0A' ?>;
-            --k86-surface: <?= $SETTINGS['surface_color'] ?? '#161616' ?>;
+            --k86-text: #FFFFFF;
+            --k86-text-muted: #9CA3AF;
+            --k86-nav-hover-bg: rgba(255, 255, 255, 0.07);
+            --k86-nav-hover-text: #FFFFFF;
+            --k86-input-bg: var(--k86-bg);
+            --k86-card-bg: var(--k86-surface);
+        }
+
+        .light-mode {
+            --k86-bg: <?= $SETTINGS['light_bg_color'] ?? '#F3F4F8' ?>;
+            --k86-surface: <?= $SETTINGS['light_surface_color'] ?? '#FFFFFF' ?>;
+            --k86-surface2: <?= str_replace('FFFFFF', 'F8FAFC', $SETTINGS['light_surface_color'] ?? 'FFFFFF') ?>;
+            --k86-border: rgba(0,0,0,0.08);
+            --k86-red: <?= $SETTINGS['light_primary_color'] ?? $SETTINGS['primary_color'] ?? '#FF2020' ?>;
+            --k86-amber: <?= $SETTINGS['light_accent_color'] ?? $SETTINGS['accent_color'] ?? '#FFB800' ?>;
+            --k86-text: <?= $SETTINGS['light_text_color'] ?? '#111827' ?>;
+            --k86-text-muted: #6B7280;
+            --k86-nav-hover-bg: rgba(0, 0, 0, 0.05);
+            --k86-nav-hover-text: var(--k86-text);
+            --k86-input-bg: var(--k86-bg);
+            --k86-card-bg: var(--k86-surface);
         }
 
         /* Custom scrollbar for dark theme */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #0A0A0A; }
-        ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: var(--k86-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--k86-border); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--k86-red); }
         
         .nav-link {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--k86-text-muted);
         }
 
         .nav-link.active {
             background-color: var(--k86-red);
-            color: white;
+            color: #FFFFFF !important;
             box-shadow: 0 10px 20px -5px rgba(255, 32, 32, 0.4);
             transform: scale(1.02);
             z-index: 10;
         }
         
         .nav-link:not(.active):hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--k86-nav-hover-text) !important;
+            background: var(--k86-nav-hover-bg);
             transform: translateX(4px);
         }
 
         .nav-link svg {
             transition: all 0.3s ease;
-            color: #666;
+            color: var(--k86-text-muted);
         }
 
         .nav-link.active svg {
-            color: white;
+            color: #FFFFFF;
         }
 
         .nav-link:hover svg {
             transform: scale(1.1);
             color: var(--k86-red);
+        }
+
+        /* Light mode sidebar overrides */
+        .light-mode aside {
+            background-color: var(--k86-surface);
+            border-color: var(--k86-border);
+        }
+
+        /* Theme Toggle Icon Swap */
+        .light-mode .theme-toggle-btn i::before {
+            content: "\f186"; /* Moon icon */
         }
     </style>
 </head>
@@ -144,6 +187,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <button class="relative text-k86-muted hover:text-white transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                     <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-k86-red rounded-full ring-2 ring-k86-surface"></span>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button onclick="window.toggleK86Theme()" class="theme-toggle-btn text-k86-muted hover:text-white transition-colors p-2 rounded-full hover:bg-k86-black/20" title="Toggle Theme">
+                    <i class="fa-solid fa-sun"></i>
                 </button>
                 
                 <!-- Profile -->

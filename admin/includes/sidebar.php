@@ -3,9 +3,9 @@ $current_page = $current_page ?? 'index.php'; // Fallback config
 
 function getNavClass($page, $current) {
     if ($page === $current) {
-        return "nav-link active flex items-center gap-3 px-4 py-3 rounded-xl font-bold bg-k86-red text-white shadow-[0_10px_20px_-5px_rgba(255,32,32,0.4)] transition-all scale-[1.02] z-10";
+        return "nav-link active flex items-center gap-3 px-4 py-3 rounded-xl font-bold bg-k86-red text-pure-white shadow-[0_10px_20px_-5px_rgba(255,32,32,0.4)] transition-all scale-[1.02] z-10";
     }
-    return "nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-k86-muted hover:text-white hover:bg-white/5 hover:translate-x-1 transition-all duration-300 group";
+    return "nav-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-k86-muted hover:text-pure-white hover:bg-k86-red/10 hover:translate-x-1 transition-all duration-300 group";
 }
 ?>
 <!-- Mobile Overlay -->
@@ -68,7 +68,7 @@ function getNavClass($page, $current) {
     </nav>
 
     <div class="p-4 border-t border-k86-border">
-        <button onclick="adminApp.logout()" class="w-full bg-k86-surface2 hover:bg-k86-red text-white py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 relative overflow-hidden group">
+        <button onclick="adminApp.logout()" class="w-full bg-k86-surface2 hover:bg-k86-red text-white hover:text-pure-white py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 relative overflow-hidden group">
             <span class="relative z-10 flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 Logout

@@ -144,4 +144,9 @@ INSERT IGNORE INTO site_settings (`key`, `value`, `group`) VALUES
 ('footer_copyright', '© 2024 Kitchen 86. All rights reserved.', 'footer'),
 ('social_instagram', 'https://instagram.com/kitchen86', 'footer'),
 ('social_facebook', 'https://facebook.com/kitchen86', 'footer'),
-('social_whatsapp', 'https://wa.me/923001234567', 'footer');
+('social_whatsapp', 'https://wa.me/923001234567', 'footer'),
+('light_bg_color', '#F8FAFC', 'brand'),
+('light_surface_color', '#FFFFFF', 'brand'),
+('light_primary_color', '#FF2020', 'brand'),
+('light_accent_color', '#FFB800', 'brand'),
+('light_text_color', '#0F172A', 'brand');

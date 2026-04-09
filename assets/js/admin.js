@@ -55,7 +55,10 @@ window.adminApp = {
     },
     // Resolve image paths for admin subdirectory
     resolveImg(path) {
-        if(!path) return '../assets/images/placeholder.jpg';
+        if(!path || path === 'assets/images/placeholder.jpg') {
+            // Return a transparent 1x1 base64 GIF to prevent 404s
+            return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        }
         if(path.startsWith('http') || path.startsWith('../')) return path;
         return '../' + path;
     },
@@ -66,6 +69,39 @@ window.adminApp = {
         
         const page = pageEl.getAttribute('data-page');
         this.fetchData(page);
+
+        // Special init for settings page previews
+        if (page === 'settings') {
+            this.initSettingsPreviews();
+        }
+    },
+
+    initSettingsPreviews() {
+        const fileInput = document.querySelector('input[name="hero_bg_image_file"]');
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (re) => {
+                        const bgPreview = document.getElementById('hero-preview-bg');
+                        if (bgPreview) bgPreview.style.backgroundImage = `url('${re.target.result}')`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Add inputs for title/sub in real-time
+        const inputs = ['hero_heading', 'hero_subheading', 'hero_cta_text'];
+        inputs.forEach(key => {
+            const el = document.querySelector(`[name="${key}"]`);
+            if (el) {
+                el.addEventListener('input', (e) => {
+                    this.updateHeroPreview(key, e.target.value);
+                });
+            }
+        });
     },
 
     async fetchData(page) {
@@ -343,7 +379,7 @@ window.adminApp = {
             let r = await fetch('../api/admin.php?resource=categories');
             let j = await r.json();
             if(j.success && j.data) {
-                catOptions = j.data.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
+                catOptions = j.data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
             }
         } catch(e) { console.error('Error fetching categories', e); }
 
@@ -469,7 +505,7 @@ window.adminApp = {
             let r = await fetch('../api/admin.php?resource=categories');
             let j = await r.json();
             if(j.success && j.data) {
-                catOptions = j.data.map(c => `<option value="${c.id}" ${c.id == item.category_id ? 'selected' : ''}>${c.icon} ${c.name}</option>`).join('');
+                catOptions = j.data.map(c => `<option value="${c.id}" ${c.id == item.category_id ? 'selected' : ''}>${c.name}</option>`).join('');
             }
         } catch(e) { console.error('Error fetching categories', e); }
 
@@ -894,7 +930,9 @@ window.adminApp = {
                 <td class="p-6">
                     <div class="flex items-center gap-4">
                         <div class="w-14 h-14 rounded-xl overflow-hidden bg-k86-black border border-k86-border shrink-0">
-                            <img src="${this.resolveImg(d.image)}" class="w-full h-full object-cover">
+                            <img src="${this.resolveImg(d.image)}" 
+                                 onerror="this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; this.parentElement.classList.add('bg-k86-surface2');" 
+                                 class="w-full h-full object-cover">
                         </div>
                         <div class="min-w-0">
                             <p class="font-bold text-white group-hover:text-k86-red transition-colors uppercase tracking-wider">${d.name}</p>
@@ -1017,7 +1055,9 @@ window.adminApp = {
                 <td class="p-4">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-lg overflow-hidden bg-k86-black border border-k86-border shrink-0">
-                            <img src="${this.resolveImg(i.image)}" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(i.name)}&background=161616&color=ff2020'">
+                            <img src="${this.resolveImg(i.image)}" 
+                                 onerror="this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; this.parentElement.classList.add('bg-k86-surface2');" 
+                                 class="w-full h-full object-cover">
                         </div>
                         <div>
                             <p class="font-bold text-white group-hover:text-k86-red transition-colors">${i.name}</p>
@@ -1874,19 +1914,19 @@ window.adminApp = {
                     this.updateHeroPreview(s.key, s.value);
                 }
             }
+            
+            // Special handling for hidden hero bg image (since we changed the main input to file)
+            if(s.key === 'hero_bg_image') {
+                const hiddenInput = document.getElementById('hero_bg_image_hidden');
+                if(hiddenInput) hiddenInput.value = s.value;
+            }
         });
     },
 
     switchSettingsTab(tab) {
-        // Update Buttons
+        // Update Buttons — only toggle .active, CSS handles all styling
         document.querySelectorAll('.settings-tab').forEach(btn => {
-            if(btn.getAttribute('data-tab') === tab) {
-                btn.classList.add('active', 'bg-k86-surface', 'border-k86-red');
-                btn.classList.remove('bg-k86-surface2', 'border-transparent', 'text-k86-muted');
-            } else {
-                btn.classList.remove('active', 'bg-k86-surface', 'border-k86-red');
-                btn.classList.add('bg-k86-surface2', 'border-transparent', 'text-k86-muted');
-            }
+            btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
         });
 
         // Update Sections
@@ -1930,13 +1970,11 @@ window.adminApp = {
         }
 
         const formData = new FormData(form);
-        const payload = Object.fromEntries(formData.entries());
 
         try {
             let r = await fetch('../api/admin.php?resource=settings', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: formData
             });
             let j = await r.json();
             if(j.success) {

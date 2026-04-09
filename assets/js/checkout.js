@@ -1,7 +1,7 @@
 window.CheckoutInterface = {
     init() { this.updateTotal(); this.bind(); },
     updateTotal() { 
-        let sub = app.cart.getTotals().sub;
+        let sub = K86.cart.getTotals().sub;
         
         // Get selected order type
         const orderTypeEl = document.querySelector('input[name="order_type"]:checked');
@@ -63,7 +63,7 @@ window.CheckoutInterface = {
             address: document.getElementById('chk-address').value,
             type: orderType,
             payment: paymentMethod,
-            items: app.cart.items
+            items: K86.cart.items
         };
 
         try {
@@ -79,7 +79,7 @@ window.CheckoutInterface = {
                     ? 'Order placed successfully! PKR 100 delivery fee included.' 
                     : 'Order placed successfully!';
                 if(window.Toast) window.Toast.show(msg, 'success');
-                app.cart.clear(); 
+                K86.cart.clear(); 
                 window.location.hash = '#home';
             } else {
                 if(window.Toast) window.Toast.show(d.message || 'Order failed', 'error');
