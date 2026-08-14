@@ -4,7 +4,8 @@ require_once __DIR__ . '/db.php';
 /**
  * Fetch all site settings and return as a key-value pair array
  */
-function getSiteSettings($pdo) {
+function getSiteSettings($pdo)
+{
     try {
         $stmt = $pdo->query("SELECT `key`, `value` FROM site_settings");
         return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
@@ -35,14 +36,15 @@ $SETTINGS['light_text_color'] = $SETTINGS['light_text_color'] ?? '#0F172A';
 /**
  * Output dynamic CSS based on site settings
  */
-function renderDynamicCSS($SETTINGS) {
+function renderDynamicCSS($SETTINGS)
+{
     $primary = $SETTINGS['primary_color'] ?? '#FF2020';
     $accent = $SETTINGS['accent_color'] ?? '#FFB800';
     $bg = $SETTINGS['bg_color'] ?? '#161616';
     $surface = $SETTINGS['surface_color'] ?? '#1A1A1A';
     $font_display = $SETTINGS['font_display'] ?? 'Bebas Neue';
     $font_primary = $SETTINGS['font_primary'] ?? 'Barlow';
-    
+
     // Light mode values from settings or defaults
     $l_bg = $SETTINGS['light_bg_color'] ?? '#F8FAFC';
     $l_surface = $SETTINGS['light_surface_color'] ?? '#FFFFFF';
@@ -93,16 +95,17 @@ function renderDynamicCSS($SETTINGS) {
     ";
 }
 
-function hexToRgb($hex) {
+function hexToRgb($hex)
+{
     $hex = str_replace("#", "", $hex);
-    if(strlen($hex) == 3) {
-        $r = hexdec(substr($hex,0,1).substr($hex,0,1));
-        $g = hexdec(substr($hex,1,1).substr($hex,1,1));
-        $b = hexdec(substr($hex,2,1).substr($hex,2,1));
+    if (strlen($hex) == 3) {
+        $r = hexdec(substr($hex, 0, 1) . substr($hex, 0, 1));
+        $g = hexdec(substr($hex, 1, 1) . substr($hex, 1, 1));
+        $b = hexdec(substr($hex, 2, 1) . substr($hex, 2, 1));
     } else {
-        $r = hexdec(substr($hex,0,2));
-        $g = hexdec(substr($hex,2,2));
-        $b = hexdec(substr($hex,4,2));
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
     }
     return "$r, $g, $b";
 }

@@ -61,7 +61,11 @@ window.CartInterface = {
     },
     getTotals() { let sub = this.items.reduce((s,i)=>s+(i.price*i.qty), 0); return {sub, total:sub}; },
     ui() {
-        document.getElementById('cart-badge').innerText = this.items.reduce((s,i)=>s+i.qty, 0);
+        const count = this.items.reduce((s,i)=>s+i.qty, 0);
+        const b1 = document.getElementById('cart-badge');
+        const b2 = document.getElementById('cart-badge-mob');
+        if(b1) b1.innerText = count;
+        if(b2) b2.innerText = count;
         let h = ''; this.items.forEach(i => h+=`<div class="flex justify-between items-center bg-k86-surface border border-k86-border p-4 rounded-xl mb-3 shadow-inner flex-row"><div><p class="font-bold text-sm text-white">${i.name}</p><p class="text-k86-amber font-price font-bold">Rs ${i.price}</p></div><div class="flex items-center gap-3 bg-k86-black rounded-lg px-2"><button class="w-6 h-6 flex items-center justify-center text-k86-red font-bold hover:scale-120 transition-transform" onclick="K86.cart.updateQty('${i.cartId}', -1)">-</button><span class="text-xs font-bold w-4 text-center text-white">${i.qty}</span><button class="w-6 h-6 flex items-center justify-center text-k86-red font-bold hover:scale-120 transition-transform" onclick="K86.cart.updateQty('${i.cartId}', 1)">+</button></div></div>`);
         document.getElementById('cart-items').innerHTML = h || '<p class="text-center">Empty Cart</p>';
         document.getElementById('cart-total').innerText = 'Rs ' + this.getTotals().total;

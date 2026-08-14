@@ -216,7 +216,7 @@ require_once __DIR__ . '/includes/site_settings.php';
                 
                 <span class="inline-block bg-k86-red/20 text-k86-red border border-k86-red px-3 py-1 rounded-full text-sm font-bold tracking-widest mb-6 animate-bounce-slow shadow-[0_0_10px_rgba(255,32,32,0.5)] uppercase"><i class="fa-solid fa-fire text-k86-red mr-1"></i> HOT & SPICY</span>
                 <h1 class="text-6xl md:text-8xl font-display text-transparent bg-clip-text bg-gradient-to-r from-k86-amber via-yellow-300 to-k86-red mb-6 drop-shadow-lg transform transition-transform duration-700 hover:scale-105 uppercase tracking-tighter leading-none"><?= $SETTINGS['hero_heading'] ?? 'BOLD. HOT. FAST.' ?></h1>
-                <p class="text-k86-muted text-lg md:text-xl font-heading max-w-2xl mx-auto mb-10"><?= $SETTINGS['hero_subheading'] ?? 'Experience the ultimate Cheezious Matka Fries & legendary Fried Chicken in Larkana.' ?></p>
+                <p class="text-white/80 text-lg md:text-xl font-heading max-w-2xl mx-auto mb-10" style="color: rgba(255,255,255,0.7) !important;"><?= $SETTINGS['hero_subheading'] ?? 'Experience the ultimate Cheezious Matka Fries & legendary Fried Chicken in Larkana.' ?></p>
                 <a href="javascript:void(0)" onclick="scrollToMenu()" class="inline-block bg-k86-red px-10 py-4 text-pure-white font-bold rounded-lg text-lg transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95 group">
                     <?= $SETTINGS['hero_cta_text'] ?? 'ORDER NOW' ?>
                     <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
@@ -652,14 +652,9 @@ require_once __DIR__ . '/includes/site_settings.php';
                 
                 originalRender.call(this, tId);
                 
+                // Content-specific post-render logic (if any specific to the page)
                 if (tId === 'tpl-home') {
-                    // Auto-load the menu into the inline #menu-grid
-                    if(typeof this.loadMenu === 'function') {
-                        this.loadMenu();
-                    }
-                    if(typeof this.loadFeatured === 'function') {
-                        this.loadFeatured();
-                    }
+                    // Specific scroll adjustments or small UI tweaks can go here
                 }
             };
         });

@@ -1,20 +1,40 @@
 const K86 = {
     cart: window.CartInterface || {}, auth: window.AuthInterface || {}, checkout: window.CheckoutInterface || {}, orders: window.OrdersInterface || {},
-    init() { this.cache(); this.bind(); this.auth.checkSession().finally(() => this.route()); },
+    init() { 
+        this.cache(); 
+        this.bind(); 
+        if(this.auth && typeof this.auth.checkSession === 'function') {
+            this.auth.checkSession().finally(() => this.route()); 
+        } else {
+            this.route();
+        }
+    },
     cache() { this.$main = document.getElementById('app-content'); },
     bind() { window.addEventListener('hashchange', () => this.route()); },
     route() {
         const h = window.location.hash || '#home';
         if(h === '#orders' && !this.auth.isLoggedIn) { window.location.hash = '#home'; return this.auth.openLogin(); }
         switch(h) {
-            case '#home': this.render('tpl-home'); break;
+            case '#home': 
+                this.render('tpl-home'); 
+                this.loadMenu();
+                this.loadFeatured();
+                break;
             case '#menu': this.render('tpl-menu'); this.loadMenu(); break;
             case '#checkout': if(!this.cart.items.length){window.location.hash='#menu'; return;} this.render('tpl-checkout'); this.checkout.init(); break;
             case '#orders': this.render('tpl-orders'); this.orders.init(); break;
-            default: this.render('tpl-home');
+            default: 
+                this.render('tpl-home');
+                this.loadMenu();
+                this.loadFeatured();
         }
     },
-    render(tId) { const t = document.getElementById(tId); this.$main.innerHTML = t ? t.innerHTML : '404'; },
+    render(tId) { 
+        const t = document.getElementById(tId); 
+        this.$main.innerHTML = t ? t.innerHTML : '404'; 
+        // Trigger reveal animations
+        if (window.observeElements) window.observeElements();
+    },
     async loadMenu() {
         try {
             const r = await fetch('api/menu.php'); 
@@ -73,9 +93,9 @@ const K86 = {
                                     <p class="text-2xl font-price font-bold text-white leading-none">PKR ${parseFloat(p.price).toLocaleString()}</p>
                                     ${p.original_price ? '<p class="text-[10px] text-k86-muted line-through font-bold mt-1">WAS PKR ' + parseFloat(p.original_price).toLocaleString() + '</p>' : ''}
                                 </div>
-                                <button onclick="K86.cart.addItem(JSON.parse(decodeURIComponent(escape(atob('${objBase64}')))))" class="w-full sm:w-auto px-4 py-2 bg-white/5 hover:bg-white text-white hover:text-black rounded-lg transition-all duration-300 font-bold uppercase text-[10px] tracking-widest border border-white/10 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                                <button onclick="K86.cart.addItem(JSON.parse(decodeURIComponent(escape(atob('${objBase64}')))))" class="w-full sm:w-auto px-6 py-2.5 ${idx % 2 === 0 ? 'hover:bg-k86-red hover:border-k86-red hover:shadow-[0_0_20px_rgba(255,32,32,0.4)]' : 'hover:bg-k86-amber hover:border-k86-amber hover:shadow-[0_0_20px_rgba(255,184,0,0.4)]'} bg-k86-surface2 text-white hover:text-pure-white rounded-xl transition-all duration-500 font-bold uppercase text-[10px] tracking-widest border border-k86-border flex items-center justify-center gap-2 group/btn">
                                     Add to Cart 
-                                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                    <svg class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                 </button>
                             </div>
                         </div>

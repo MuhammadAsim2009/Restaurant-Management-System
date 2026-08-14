@@ -1,6 +1,6 @@
-(function() {
+(function () {
     const THEME_KEY = 'k86_theme_preference';
-    
+
     // Function to apply theme correctly
     const applyTheme = (theme) => {
         if (theme === 'light') {
@@ -9,7 +9,7 @@
             document.documentElement.classList.remove('light-mode');
         }
         localStorage.setItem(THEME_KEY, theme);
-        
+
         // Dispatch event for components that need to react
         window.dispatchEvent(new CustomEvent('k86-theme-changed', { detail: { theme } }));
     };
