@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/header.php';
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
             <h1 class="text-4xl md:text-5xl font-display text-white tracking-widest uppercase">Dashboard Overview</h1>
-            <p class="text-k86-muted font-body mt-1">Real-time business performance metrics for <span class="text-k86-red font-semibold">Kitchen 86</span>.</p>
+            <p class="text-k86-muted font-body mt-1">Real-time business performance metrics for <span class="text-k86-red font-semibold"><?= htmlspecialchars($SETTINGS['site_name'] ?? 'Restaurant') ?></span>.</p>
         </div>
         <div class="flex items-center gap-3 bg-k86-surface2 p-1.5 rounded-xl border border-k86-border shadow-inner">
             <button class="px-4 py-2 bg-k86-red text-white rounded-lg text-sm font-bold shadow-lg shadow-k86-red/20 transition-all">Today</button>

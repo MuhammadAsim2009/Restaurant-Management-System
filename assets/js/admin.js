@@ -1,4 +1,4 @@
-/** Kitchen 86 - Admin Panel MPA logic */
+/** Restaurant Management System - Admin Panel MPA logic */
 window.adminApp = {
     revenueChart: null,
     itemsCache: [], // Local cache for products

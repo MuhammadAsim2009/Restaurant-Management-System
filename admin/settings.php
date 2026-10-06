@@ -65,7 +65,7 @@ require_once __DIR__ . '/includes/header.php';
                             <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Site Name</label>
                             <input type="text" name="site_name"
                                 class="w-full bg-k86-black border border-k86-border rounded-xl px-5 py-4 text-white focus:border-k86-red transition-all outline-none shadow-inner"
-                                placeholder="Kitchen 86">
+                                placeholder="Restaurant">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] uppercase font-bold text-k86-muted ml-1">Tagline / Slogan</label>

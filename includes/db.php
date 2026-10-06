@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$dbname = 'kitchen86';
+$dbname = 'restaurant_db';
 $username = 'root';
 $password = '';
 

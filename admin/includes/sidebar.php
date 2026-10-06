@@ -15,7 +15,7 @@ function getNavClass($page, $current) {
 <aside id="sidebar" class="w-64 bg-k86-surface border-r border-k86-border min-h-screen flex flex-col fixed h-full z-30 transition-transform duration-300 transform -translate-x-full md:translate-x-0">
     <div class="p-6 border-b border-k86-border flex items-center justify-between">
         <?php 
-        $site_name = $SETTINGS['site_name'] ?? 'KITCHEN 86';
+        $site_name = $SETTINGS['site_name'] ?? 'RESTAURANT';
         $parts = explode(' ', $site_name);
         if (count($parts) >= 2): 
         ?>

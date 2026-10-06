@@ -1,93 +1,124 @@
-# 🍗 Kitchen 86 — Restaurant Management MVP
+# 🍔 Restaurant Management & Online Ordering System (MVP)
 
-> A premium, fully dynamic restaurant management system and ordering platform for Kitchen 86 Larkana.  
-> Specialized in **Cheezious Matka Fries & Fried Chicken** 🔥
-
----
-
-## 📌 Project Overview
-
-**Stack:** HTML5 · Vanilla JavaScript (SPA) · Tailwind CSS · PHP 8+ · MySQL  
-**Location:** Beside KFC & Jinnah Bagh, Larkana, Pakistan  
-**Dynamic Control:** Fully manageable via the integrated Admin Panel.
+> A full-stack, dynamic restaurant management system and online ordering platform with real-time analytics, dynamic theme customizer, order tracking, and a comprehensive admin suite.
 
 ---
 
-## 🌟 Key Features
+## 📌 Features
 
 ### 🛒 Customer Storefront (SPA)
-- **Fluid Navigation**: Seamless hash-based routing for a single-page experience.
-- **Dynamic Menu**: Real-time fetching of menu items and deals by category.
-- **Smart Cart**: Persistent local-storage based cart with live totals and tax calculation.
-- **Modern Checkout**: Guest and registered user checkout flows with instant order tracking.
-- **Auth System**: Secure login and registration with session-based authentication.
+- **Fluid Single Page Application**: Fast navigation, smooth category tabs, and interactive animations.
+- **Dynamic Menu & Deals**: Real-time fetching of dishes, custom deal combos, price tags, and dietary badges.
+- **Persistent Cart & Fast Checkout**: LocalStorage-backed cart with item customization, delivery fee calculation, and order placement.
+- **Live Order Tracking**: Instant tracking status with visual progression steps (Pending $\rightarrow$ Confirmed $\rightarrow$ Preparing $\rightarrow$ Ready $\rightarrow$ Delivered).
+- **Authentication**: Customer registration and login system with secure session management.
+- **Contact & Inquiry Form**: Built-in messaging form linked directly to the admin message inbox.
 
-### 🔐 Admin Dashboard
-- **Instant Stats**: Real-time overview of today's orders, revenue, and pending tasks.
-- **Dynamic Site Branding**: Update site name, tagline, colors, and fonts instantly without code changes.
-- **Message Center**: Manage customer inquiries directly from the dashboard with 'Read/Unread' status tracking.
-- **Full CRUD Managers**: Total control over Menu Items, Deals, Categories, and Users.
-- **Order Management**: Professional order processing with status updates and printable invoices.
+### 🔐 Admin Control Center
+- **Live Performance Dashboard**: Real-time metrics for today's orders, total revenue, average order value, and visual sales analytics powered by Chart.js.
+- **Order Management & Invoicing**: Update order lifecycle statuses, filter by date/status, and generate printable invoices.
+- **Menu & Category Management**: Full CRUD capabilities to add, edit, feature, or temporarily disable dishes and category icons.
+- **Deals & Combos Builder**: Create promotional deals and combo meals with discounted pricing and expiry dates.
+- **Real-Time Theme & Branding Customizer**: Modify site name, logo text, slogans, hero headers, color palette (Primary, Accent, Backgrounds), and typography (Display & Body fonts) without writing a single line of code!
+- **Customer Messages & Inquiries**: Read, filter, and respond to incoming customer contact queries.
 
 ---
 
-## 🎨 Brand Identity
+## 🛠️ Tech Stack
 
-The system uses a high-contrast, premium dark theme tailored to the Kitchen 86 brand:
-- **Primary Color**: `#FF2020` (Kitchen 86 Red)
-- **Accent Color**: `#FFB800` (Amber/Fire)
-- **Base Theme**: Deep Black and Surface Charcoal for a modern, fast-food aesthetic.
+- **Frontend**: HTML5, Vanilla JavaScript (ES6+), Tailwind CSS (CDN / Utility classes), FontAwesome 6, Chart.js
+- **Backend**: Native PHP 8.x (Modular API Architecture & PDO)
+- **Database**: MySQL (Relational schema with cascade rules and indexing)
+- **Security**: Bcrypt password hashing, PDO prepared statements against SQL injection, and session-based Role-Based Access Control (RBAC).
 
 ---
 
 ## 🗂️ Project Structure
 
 ```
-kitchen86/
-├── index.php               # Customer SPA Main Shell
+Restaurant-Management-System/
+├── index.php               # Customer Storefront Shell
 ├── admin/                  # Admin Dashboard Module
-│   ├── index.php           # Dashboard Entry
-│   ├── messages.php        # Message Management
-│   ├── settings.php        # Dynamic Site Settings
-│   └── print_order.php     # Invoice Generation
-├── api/                    # RESTful JSON APIs
-│   ├── auth.php            # Security & Session
-│   ├── menu.php            # Menu & Deals Data
+│   ├── index.php           # Admin Analytics Dashboard
+│   ├── categories.php      # Category Manager
+│   ├── items.php           # Menu Item Manager
+│   ├── deals.php           # Deals & Combos Manager
 │   ├── orders.php          # Order Processing
-│   └── contact.php         # Public Message API
-├── includes/               # Core Logic & Utilities
-│   ├── db.php              # PDO Connection
-│   ├── site_settings.php   # Dynamic Config Loader
-│   └── auth_guard.php      # Admin Authorization
-├── assets/                 # Frontend Resources
-│   ├── js/                 # App logic (app.js, cart.js, auth.js)
-│   └── css/                # Custom Styles & Tailwind
+│   ├── messages.php        # Customer Inquiry Inbox
+│   ├── settings.php        # Dynamic Theme & Site Settings
+│   ├── users.php           # User & Staff Management
+│   └── print_order.php     # Receipt & Invoice Generator
+├── api/                    # RESTful JSON Endpoints
+│   ├── admin.php           # Admin CRUD & Metrics Endpoints
+│   ├── auth.php            # Login, Registration & Session
+│   ├── cart.php            # Cart operations
+│   ├── contact.php         # Customer Inquiry Submission
+│   ├── menu.php            # Public Menu & Categories Fetching
+│   ├── orders.php          # Checkout & Order Placement
+│   └── upload.php          # Image Upload Handler
+├── includes/               # Core Utilities & Configurations
+│   ├── db.php              # PDO Database Connection
+│   ├── site_settings.php   # Dynamic Config & CSS Injector
+│   ├── session.php         # Session Management
+│   ├── auth_guard.php      # Role-Based Access Guard
+│   └── response.php        # Unified JSON Responder
+├── assets/                 # Static Assets
+│   ├── js/                 # Modular JS (app.js, admin.js, cart.js, etc.)
+│   └── css/                # Custom Stylesheets & Theme Variables
 └── sql/
-    └── kitchen86.sql       # COMPLETED Master Database Schema & Seed
+    └── schema.sql          # Master Database Schema & Initial Seed Data
 ```
 
 ---
 
-## 🚀 Quick Setup
+## 🚀 Quick Start Guide
 
-1.  **Clone/Copy Files**: Place the project folder in your web root (e.g., `xampp/htdocs/Kitchen_86_MVP`).
-2.  **Database Import**:
-    - Create a database named `kitchen86`.
-    - Import the **master** SQL file: `sql/kitchen86.sql`.
-3.  **Config**: Update `includes/db.php` with your local database credentials if they differ from defaults (root/no password).
+### Prerequisites
+- PHP >= 8.0
+- MySQL >= 5.7 or MariaDB
+- Apache / Nginx web server (e.g. XAMPP, WAMP, Laragon, or PHP built-in server)
 
-### Default Admin Credentials
-- **Email**: ``sasim4589@gmail.com`
-- **Password**: `Asim@123`
+### 1. Installation
+Clone or download the repository into your web root directory:
+```bash
+git clone https://github.com/your-username/Restaurant-Management-System.git
+```
+
+### 2. Database Setup
+1. Open your database management tool (e.g., phpMyAdmin, MySQL CLI, DBeaver).
+2. Create a new database named `restaurant_db` (or import directly):
+```sql
+CREATE DATABASE restaurant_db;
+```
+3. Import `sql/schema.sql` into your database.
+
+### 3. Database Configuration
+Open `includes/db.php` and verify your connection parameters:
+```php
+$host = 'localhost';
+$dbname = 'restaurant_db';
+$username = 'root';
+$password = ''; // Set your database password if applicable
+```
+
+### 4. Access the Application
+- **Customer Storefront**: `http://localhost/Restaurant-Management-System/`
+- **Admin Dashboard**: `http://localhost/Restaurant-Management-System/admin/`
+
+#### Default Admin Credentials
+- **Email**: `admin@restaurant.com`
+- **Password**: `admin@123`
 
 ---
 
-## 🔐 Security & Optimization
-- **Secure Hashing**: All passwords use `bcrypt` encryption.
-- **SQL Protection**: Forced use of PDO prepared statements throughout to prevent injection.
-- **Access Control**: Robust server-side role verification for all admin routes.
-- **Optimized UI**: Modern skeleton loaders and toast notifications for an enhanced user experience.
+## 🎨 Customizing the Brand
+Once logged in to the Admin Dashboard:
+1. Navigate to **Site Settings** (`admin/settings.php`).
+2. Update the **Site Name**, **Tagline**, **Contact Details**, and **Address**.
+3. Customize your brand colors (Primary, Accent, Backgrounds) and typography.
+4. Changes take effect across both the storefront and admin panel immediately!
 
 ---
-*Developed for Kitchen 86 · Larkana, Pakistan · Beside KFC & Jinnah Bagh*  
-**Contact:** [Instagram](https://instagram.com/the_kitchen86) | [Facebook](https://facebook.com/p/Kitchen-86-61550338954877)
+
+## 🛡️ License & Contributions
+Distributed under the MIT License. Contributions and pull requests are welcome!

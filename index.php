@@ -6,7 +6,7 @@ require_once __DIR__ . '/includes/site_settings.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $SETTINGS['site_name'] ?? 'Kitchen 86' ?> | <?= $SETTINGS['site_tagline'] ?? 'Cheezious Matka Fries & Fried Chicken' ?></title>
+    <title><?= $SETTINGS['site_name'] ?? 'Restaurant' ?> | <?= $SETTINGS['site_tagline'] ?? 'Artisanal Dining & Online Ordering' ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="assets/js/theme.js"></script>
@@ -140,7 +140,7 @@ require_once __DIR__ . '/includes/site_settings.php';
     <!-- Navbar -->
     <nav id="main-nav" class="sticky top-0 z-40 bg-k86-surface/80 backdrop-blur-md border-b border-k86-border px-4 py-3 transition-colors duration-300">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <a href="#home" class="text-k86-red font-display text-4xl tracking-wider hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(255,32,32,0.5)] uppercase"><?= $SETTINGS['site_name'] ?? 'KITCHEN 86' ?></a>
+            <a href="#home" class="text-k86-red font-display text-4xl tracking-wider hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(255,32,32,0.5)] uppercase"><?= $SETTINGS['site_name'] ?? 'RESTAURANT' ?></a>
             
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center gap-6 text-sm font-semibold tracking-wide">
@@ -214,9 +214,9 @@ require_once __DIR__ . '/includes/site_settings.php';
                 <div class="absolute top-0 left-0 w-32 h-32 bg-k86-red rounded-full opacity-10 blur-3xl animate-pulse-fast"></div>
                 <div class="absolute bottom-0 right-0 w-48 h-48 bg-k86-amber rounded-full opacity-10 blur-3xl animate-pulse-fast" style="animation-delay: 1s;"></div>
                 
-                <span class="inline-block bg-k86-red/20 text-k86-red border border-k86-red px-3 py-1 rounded-full text-sm font-bold tracking-widest mb-6 animate-bounce-slow shadow-[0_0_10px_rgba(255,32,32,0.5)] uppercase"><i class="fa-solid fa-fire text-k86-red mr-1"></i> HOT & SPICY</span>
-                <h1 class="text-6xl md:text-8xl font-display text-transparent bg-clip-text bg-gradient-to-r from-k86-amber via-yellow-300 to-k86-red mb-6 drop-shadow-lg transform transition-transform duration-700 hover:scale-105 uppercase tracking-tighter leading-none"><?= $SETTINGS['hero_heading'] ?? 'BOLD. HOT. FAST.' ?></h1>
-                <p class="text-white/80 text-lg md:text-xl font-heading max-w-2xl mx-auto mb-10" style="color: rgba(255,255,255,0.7) !important;"><?= $SETTINGS['hero_subheading'] ?? 'Experience the ultimate Cheezious Matka Fries & legendary Fried Chicken in Larkana.' ?></p>
+                <span class="inline-block bg-k86-red/20 text-k86-red border border-k86-red px-3 py-1 rounded-full text-sm font-bold tracking-widest mb-6 animate-bounce-slow shadow-[0_0_10px_rgba(255,32,32,0.5)] uppercase"><i class="fa-solid fa-fire text-k86-red mr-1"></i> HOT & FRESH</span>
+                <h1 class="text-6xl md:text-8xl font-display text-transparent bg-clip-text bg-gradient-to-r from-k86-amber via-yellow-300 to-k86-red mb-6 drop-shadow-lg transform transition-transform duration-700 hover:scale-105 uppercase tracking-tighter leading-none"><?= $SETTINGS['hero_heading'] ?? 'BOLD. HOT. FRESH.' ?></h1>
+                <p class="text-white/80 text-lg md:text-xl font-heading max-w-2xl mx-auto mb-10" style="color: rgba(255,255,255,0.7) !important;"><?= $SETTINGS['hero_subheading'] ?? 'Experience artisanal gourmet recipes, handcrafted meals & fast delivery.' ?></p>
                 <a href="javascript:void(0)" onclick="scrollToMenu()" class="inline-block bg-k86-red px-10 py-4 text-pure-white font-bold rounded-lg text-lg transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,32,32,0.6)] active:scale-95 group">
                     <?= $SETTINGS['hero_cta_text'] ?? 'ORDER NOW' ?>
                     <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
@@ -244,12 +244,12 @@ require_once __DIR__ . '/includes/site_settings.php';
                     <span class="text-k86-red font-bold tracking-widest text-sm uppercase flex items-center gap-2">
                         <span class="w-8 h-0.5 bg-k86-red inline-block"></span> Our Story
                     </span>
-                    <h2 class="text-5xl md:text-6xl font-display text-white drop-shadow-md">Born in the Heart of Larkana</h2>
-                    <p class="text-k86-muted text-lg leading-relaxed font-body"><?= nl2br(htmlspecialchars($SETTINGS['about_us'] ?? 'Kitchen 86 started with a simple belief: fast food shouldn\'t be boring. We brought the authentic, mouth-watering experience of Cheezious Matka Fries and perfectly spiced Fried Chicken straight to your neighborhood.')) ?></p>
+                    <h2 class="text-5xl md:text-6xl font-display text-white drop-shadow-md">Crafted With Passion & Taste</h2>
+                    <p class="text-k86-muted text-lg leading-relaxed font-body"><?= nl2br(htmlspecialchars($SETTINGS['about_us'] ?? 'We started with a simple belief: dining out should be exceptional. We bring you authentic, mouth-watering gourmet dishes, crafted with fresh ingredients and passion straight to your table.')) ?></p>
                 </div>
                 <div class="relative group">
                     <div class="absolute -inset-2 bg-gradient-to-r from-k86-red to-k86-amber rounded-2xl opacity-20 group-hover:opacity-40 blur-xl transition duration-500"></div>
-                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80" alt="Kitchen 86 Experience" class="relative rounded-2xl w-full h-[400px] object-cover shadow-2xl transform transition duration-500 group-hover:scale-[1.02] border border-k86-border">
+                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80" alt="Restaurant Experience" class="relative rounded-2xl w-full h-[400px] object-cover shadow-2xl transform transition duration-500 group-hover:scale-[1.02] border border-k86-border">
                 </div>
             </div>
         </div>
@@ -294,9 +294,9 @@ require_once __DIR__ . '/includes/site_settings.php';
                 <!-- Google Maps Embed -->
                 <div class="flex flex-col h-full min-h-[350px] relative rounded-2xl overflow-hidden border border-k86-surface2 group mt-8 md:mt-0 shadow-lg">
                     <div class="absolute inset-0 bg-gradient-to-b from-k86-red/20 to-k86-black/60 group-hover:opacity-0 transition-opacity duration-700 z-10 pointer-events-none mix-blend-color"></div>
-                    <iframe src="<?= $SETTINGS['map_embed_link'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d113645.92209142858!2d68.14081041935661!3d27.545802213768292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x393504fb4d2eb7b7%3A0xe5a36aa27ed7ebf!2sLarkana%2C%20Sindh%2C%20Pakistan!5e0!3m2!1sen!2s!4v1711200000000!5m2!1sen!2s' ?>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="absolute inset-0 grayscale contrast-125 opacity-70 group-hover:grayscale-[0.5] group-hover:opacity-100 transition-all duration-700"></iframe>
+                    <iframe src="<?= $SETTINGS['map_embed_link'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.215209172265!2d-73.9878440234858!3d40.75797873484252!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQ1JzI4LjciTiA3M8KwNTknMDguMyJX!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus' ?>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="absolute inset-0 grayscale contrast-125 opacity-70 group-hover:grayscale-[0.5] group-hover:opacity-100 transition-all duration-700"></iframe>
                     <div class="absolute bottom-4 left-4 right-4 bg-k86-surface/90 backdrop-blur-md border border-k86-border p-4 rounded-xl z-20 shadow-xl transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                        <p class="font-heading font-bold text-white mb-1 uppercase tracking-wider"><svg class="w-4 h-4 inline-block mr-1 text-k86-red mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> <?= $SETTINGS['site_name'] ?? 'Kitchen 86' ?> HQ</p>
+                        <p class="font-heading font-bold text-white mb-1 uppercase tracking-wider"><svg class="w-4 h-4 inline-block mr-1 text-k86-red mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> <?= $SETTINGS['site_name'] ?? 'Restaurant' ?> HQ</p>
                     </div>
                 </div>
             </div>
@@ -666,8 +666,8 @@ require_once __DIR__ . '/includes/site_settings.php';
         <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10">
             <!-- Brand -->
             <div class="col-span-1 md:col-span-1">
-                <a href="#home" onclick="window.scrollTo({top:0, behavior:'smooth'})" class="text-k86-red font-display text-4xl tracking-wider inline-block mb-4 hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(255,32,32,0.3)] uppercase tracking-tighter"><?= $SETTINGS['site_name'] ?? 'KITCHEN 86' ?></a>
-                <p class="text-k86-muted text-xs mb-6 font-heading uppercase tracking-widest leading-loose"><?= $SETTINGS['footer_description'] ?? 'SERVERS OF FINE FOOD & BOLD FLAVORS IN THE HEART OF LARKANA.' ?></p>
+                <a href="#home" onclick="window.scrollTo({top:0, behavior:'smooth'})" class="text-k86-red font-display text-4xl tracking-wider inline-block mb-4 hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(255,32,32,0.3)] uppercase tracking-tighter"><?= $SETTINGS['site_name'] ?? 'RESTAURANT' ?></a>
+                <p class="text-k86-muted text-xs mb-6 font-heading uppercase tracking-widest leading-loose"><?= $SETTINGS['footer_description'] ?? 'SERVERS OF FINE FOOD & BOLD FLAVORS CRAFTED WITH PASSION.' ?></p>
                 <div class="flex gap-4">
                     <?php if(!empty($SETTINGS['social_instagram'])): ?>
                     <a href="<?= $SETTINGS['social_instagram'] ?>" target="_blank" class="w-10 h-10 rounded-full bg-k86-surface2 border border-k86-border flex items-center justify-center text-white hover:border-k86-red hover:text-k86-red hover:shadow-[0_0_10px_rgba(255,32,32,0.4)] transition-all transform hover:-translate-y-1"><i class="fab fa-instagram"></i></a>
@@ -698,15 +698,15 @@ require_once __DIR__ . '/includes/site_settings.php';
                 <ul class="space-y-4 text-k86-muted text-[10px] uppercase tracking-widest font-bold">
                     <li class="flex items-start gap-3">
                         <svg class="w-4 h-4 text-k86-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span class="leading-relaxed"><?= $SETTINGS['address'] ?? 'VIP ROAD, LARKANA<br>SINDH, PAKISTAN' ?></span>
+                        <span class="leading-relaxed"><?= $SETTINGS['address'] ?? '123 GOURMET BOULEVARD<br>FOOD DISTRICT' ?></span>
                     </li>
                     <li class="flex items-center gap-3">
                         <svg class="w-4 h-4 text-k86-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                        <span><?= $SETTINGS['contact_phone'] ?? '+92 300 1234567' ?></span>
+                        <span><?= $SETTINGS['contact_phone'] ?? '+1 (555) 019-2834' ?></span>
                     </li>
                     <li class="flex items-center gap-3 lowercase transform -translate-x-1">
                         <svg class="w-4 h-4 text-k86-amber shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        <span class="tracking-widest uppercase text-[9px]"><?= $SETTINGS['contact_email'] ?? 'INFO@KITCHEN86.COM' ?></span>
+                        <span class="tracking-widest uppercase text-[9px]"><?= $SETTINGS['contact_email'] ?? 'CONTACT@RESTAURANT.COM' ?></span>
                     </li>
                 </ul>
             </div>
@@ -722,7 +722,7 @@ require_once __DIR__ . '/includes/site_settings.php';
         </div>
         
         <div class="max-w-6xl mx-auto px-4 mt-12 pt-8 border-t border-k86-surface2 text-center text-[10px] text-k86-muted uppercase tracking-[0.3em] font-bold relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p><?= $SETTINGS['footer_copyright'] ?? '© 2024 KITCHEN 86. ALL RIGHTS RESERVED.' ?></p>
+            <p><?= $SETTINGS['footer_copyright'] ?? '© 2026 RESTAURANT. ALL RIGHTS RESERVED.' ?></p>
             <div class="flex gap-6">
                 <a href="javascript:void(0)" class="hover:text-white transition-colors">PRIVACY POLICY</a>
                 <a href="javascript:void(0)" class="hover:text-white transition-colors">TERMS OF SERVICE</a>

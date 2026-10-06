@@ -192,7 +192,7 @@ try {
 
     <div class="header">
         <div class="logo-box">
-            <h1><?php echo htmlspecialchars($SETTINGS['site_name'] ?? 'KITCHEN 86'); ?></h1>
+            <h1><?php echo htmlspecialchars($SETTINGS['site_name'] ?? 'RESTAURANT'); ?></h1>
             <p>Official Order Invoice</p>
         </div>
         <div class="order-info">
@@ -254,7 +254,7 @@ try {
     </div>
 
     <div class="footer">
-        <p>Thank you for choosing <?php echo htmlspecialchars($SETTINGS['site_name'] ?? 'Kitchen 86'); ?>! We hope you enjoy your meal.</p>
+        <p>Thank you for choosing <?php echo htmlspecialchars($SETTINGS['site_name'] ?? 'Restaurant'); ?>! We hope you enjoy your meal.</p>
         <p>This is a computer-generated invoice.</p>
     </div>
 

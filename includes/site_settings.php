@@ -18,7 +18,7 @@ function getSiteSettings($pdo)
 $SETTINGS = getSiteSettings($pdo);
 
 // Default values for common settings (fallback)
-$site_name = $SETTINGS['site_name'] ?? 'Kitchen 86';
+$site_name = $SETTINGS['site_name'] ?? 'Restaurant';
 $primary_color = $SETTINGS['primary_color'] ?? '#FF2020';
 $accent_color = $SETTINGS['accent_color'] ?? '#FFB800';
 $bg_color = $SETTINGS['bg_color'] ?? '#161616';
