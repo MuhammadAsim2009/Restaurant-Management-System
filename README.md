@@ -1,4 +1,4 @@
-# 🍔 Restaurant Management & Online Ordering System (MVP)
+# 🍔 Restaurant Management & Online Ordering System
 
 > A full-stack, dynamic restaurant management system and online ordering platform with real-time analytics, dynamic theme customizer, order tracking, and a comprehensive admin suite.
 
@@ -81,7 +81,7 @@ Restaurant-Management-System/
 ### 1. Installation
 Clone or download the repository into your web root directory:
 ```bash
-git clone https://github.com/your-username/Restaurant-Management-System.git
+git clone https://github.com/MuhammadAsim2009/Restaurant-Management-System.git
 ```
 
 ### 2. Database Setup
